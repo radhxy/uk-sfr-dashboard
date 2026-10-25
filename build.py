@@ -9,7 +9,7 @@ DS = {
  'bulk_deals': ('bulk_deals.json', 'Land Registry bulk deals', '5+ new-build houses on one street registered the same day to a non-private buyer (Price Paid category B), Jan 2019 to Aug 2026, with the local open-market new-build median and outcode coordinates (postcodes.io). Deals at 80%+ of local open market are classed as likely SFR/PRS.'),
  'developer_metrics': ('developer_metrics.json', 'Housebuilder reported metrics', 'Average selling prices, sales rates with and without bulk/PRS sales and completions from Barratt Redrow, Persimmon, Taylor Wimpey, Bellway and Vistry results (2025–2026), each with its source.'),
  'area_quarterly': ('area_quarterly.json', 'Council rents and prices by size', 'Quarterly, 2019 Q1 to 2026 Q3, for every council in eight English regions, the regions and England: rent by bedrooms and property type (ONS PIPR), average price by property type (UK HPI), standard new-build house sales and median price (Price Paid), houses in likely SFR bulk deals.'),
- 'schemes': ('schemes_sample.json', 'Sample SFR schemes', 'Illustrative schemes generated for the Development economics tab. Not real developments or company figures.'),
+ 'developer_economics': ('developer_economics.json', 'Housebuilder economics', 'Gross and operating margins, private and bulk/partner average selling prices, land cost as a share of ASP, land bank, build cost inflation and bulk or partner volumes from Barratt Redrow (FY26), Bellway (FY26), Persimmon, Taylor Wimpey and Vistry (H1 2026) results. Land shares marked derived are calculated from reported land values and plot counts.'),
 }
 cfg = {k: {'file': v[0]} for k, v in DS.items()}
 sources = ''.join(f'<div><dt>{html.escape(t)}</dt><dd>{html.escape(d)}</dd></div>' for _, t, d in DS.values())

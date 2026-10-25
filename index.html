@@ -66,6 +66,11 @@ a { color: inherit; }
 .sfr-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
 .sfr-page { display: grid; gap: var(--cds-gap-md); }
 .sfr-page[hidden] { display: none; }
+.sfr-grid[hidden] { display: none; }
+.sfr-grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); }
+.sfr th:not(:has(button)) { padding: var(--cds-pad-xs) var(--cds-pad-sm); }
+.sfr-lede { max-width: 80ch; }
+.sfr-prior { color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
 .sfr-drop { display: grid; gap: var(--cds-gap-xs); justify-items: center; text-align: center; padding: var(--cds-pad-xl) var(--cds-pad-lg); border: 1.5px dashed var(--color-border-line); border-radius: var(--cds-radius); cursor: pointer; transition: border-color var(--cds-dur-slow), background var(--cds-dur-slow); }
 .sfr-drop:hover, .sfr-drop.over { border-color: var(--color-fg); background: color-mix(in srgb, var(--color-fg) 4%, transparent); }
 .sfr-drop:focus-within { outline: 2px solid var(--color-fg); outline-offset: 2px; }
@@ -144,10 +149,10 @@ a { color: inherit; }
       <b class="dash-skeleton" data-source="kpi" data-field="bulk_price" data-k="kpi">—</b>,
       <b class="dash-skeleton" data-source="kpi" data-field="bulk_discount" data-k="kpi">—</b> below local open-market new-build prices.
     </p>
-    <div class="sfr-banner" role="note"><strong>Public data</strong><span>Prices, rents, bulk deals and housebuilding come from ONS, HM Land Registry and MHCLG; developer figures from company results. Net yields assume operating costs of 25% of rent (30% in London). Price forecasts blend Knight Frank and Savills national forecasts; rent forecasts are a trend assumption. The Development economics tab is still sample data.</span></div>
+    <div class="sfr-banner" role="note"><strong>Public data</strong><span>Prices, rents, bulk deals and housebuilding come from ONS, HM Land Registry and MHCLG; developer figures from company results. Net yields assume operating costs of 25% of rent (30% in London). Price forecasts blend Knight Frank and Savills national forecasts; rent forecasts are a trend assumption. Development economics uses each housebuilder's reported margins and land costs.</span></div>
     <div class="sfr-filters">
       <label for="f-region">Region<select id="f-region" data-source="region_quarterly"></select></label>
-      <label for="f-dev">Developer<select id="f-dev" data-source="developer_metrics schemes"></select></label>
+      <label for="f-dev">Developer<select id="f-dev" data-source="developer_metrics developer_economics"></select></label>
       <button class="sfr-btn" id="f-reset" type="button">Reset</button>
     </div>
   </header>
@@ -337,11 +342,45 @@ a { color: inherit; }
   </section>
 
   <section class="sfr-page" id="economics" data-page="economics" hidden>
-    <div class="sfr-banner" role="note" id="econ-banner"><strong id="econ-banner-label">Sample data</strong><span id="econ-banner-text">Land and build costs per scheme are not published. These charts use illustrative schemes until you drop in your own appraisals or deal data below.</span></div>
+    <p class="sfr-note sfr-lede">Company-wide figures from each housebuilder's latest results. No developer publishes costs scheme by scheme; to see your own schemes, drop a spreadsheet into the box at the bottom of this tab.</p>
+    <div class="sfr-grid two">
+      <div class="sfr-card wide" id="card-econ-table">
+        <div><h2>Developer economics</h2><p class="sfr-note">Latest reported period. Margins are on each company's adjusted or underlying basis (hover a value for its definition). Click a row to filter by developer.</p></div>
+        <div class="sfr-tablewrap"><table id="econ-table" data-source="developer_economics" data-row-key="developer"><thead><tr>
+          <th data-field="developer">Developer</th>
+          <th data-field="period">Period</th>
+          <th class="num" data-field="gross_margin">Gross margin</th>
+          <th class="num" data-field="operating_margin">Operating margin</th>
+          <th class="num" data-field="asp_private">Private ASP</th>
+          <th class="num" data-field="land_cost_pct">Land % of ASP</th>
+          <th class="num hide-sm" data-field="landbank_plots">Land bank plots</th>
+          <th class="num hide-sm" data-field="build_inflation_short">Build cost inflation</th>
+          <th class="num hide-sm" data-field="bulk_homes">Bulk / partner homes</th>
+          <th data-field="source_type">Source</th>
+        </tr></thead><tbody></tbody></table></div>
+        <p class="sfr-note">Land % marked † is derived from reported land values and plot counts, not stated by the company. Vistry's gross margin isn't confirmed in its results document, so it's left blank.</p>
+      </div>
+      <div class="sfr-card" id="card-margins">
+        <div><h2>Margins, latest vs prior period</h2><p class="sfr-note">Every developer's margins have narrowed: lower underlying prices, more incentives and 2–4% build cost inflation. Ring is the prior period, dot the latest.</p></div>
+        <div class="sfr-chart" id="margin-chart" data-source="developer_economics"></div>
+        <div class="sfr-legend" id="margin-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-bulkprice">
+        <div><h2>What bulk and partner buyers pay</h2><p class="sfr-note">Average price per home sold to PRS, housing association or partner buyers, against the developer's private ASP. Only Barratt Redrow reports a PRS-only price. Differences also reflect smaller homes and location, not just discount.</p></div>
+        <div class="sfr-chart" id="bulkprice-chart" data-source="developer_economics"></div>
+        <div class="sfr-legend" id="bulkprice-legend"></div>
+      </div>
+      <div class="sfr-card wide" id="card-unitecon">
+        <div><h2>Where the private sale price goes</h2><p class="sfr-note">Per private home, from each developer's ASP, land cost share and gross margin. Build &amp; other is the remainder of cost of sales. The tick marks the average price bulk or partner buyers paid, where reported; those homes are usually smaller and cheaper to build, so a tick inside the cost bar doesn't mean a loss-making sale. Derived figures, not reported line items.</p></div>
+        <div class="sfr-chart" id="unitecon-chart" data-source="dev_unit_economics"></div>
+        <div class="sfr-legend" id="unitecon-legend"></div>
+      </div>
+    </div>
+    <div class="sfr-banner" role="note" id="econ-banner" hidden><strong id="econ-banner-label">Your data</strong><span id="econ-banner-text"></span></div>
     <div class="sfr-card wide" id="card-upload">
       <div class="sfr-cardhead">
-        <div><h2>Your scheme data</h2><p class="sfr-note">Drop an Excel (.xlsx) or CSV file with one row per scheme and the charts below recalculate from it. The file is read in your browser and goes nowhere else: it lasts until you reload the page, and other viewers keep seeing the sample. To keep it on the dashboard for everyone, send the file to Claude in chat.</p></div>
-        <button class="sfr-btn" id="up-clear" type="button" hidden>Back to sample data</button>
+        <div><h2>Your scheme data</h2><p class="sfr-note">Drop an Excel (.xlsx) or CSV file with one row per scheme to see cost against exit price, development spread and margin by scheme. The file is read in your browser and goes nowhere else: it lasts until you reload the page and no other viewer sees it.</p></div>
+        <button class="sfr-btn" id="up-clear" type="button" hidden>Clear my data</button>
       </div>
       <label class="sfr-drop" id="up-drop" for="up-file">
         <input id="up-file" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
@@ -356,20 +395,20 @@ a { color: inherit; }
       </details>
       <div class="sfr-tablewrap" id="up-preview-wrap" hidden><table id="up-preview"><thead></thead><tbody></tbody></table></div>
     </div>
-    <div class="sfr-grid">
+    <div class="sfr-grid" id="econ-schemes" hidden>
       <div class="sfr-card wide" id="card-stack">
-        <div><h2>Cost to build vs price achieved, per unit</h2><p class="sfr-note"><span class="t-region">All regions</span>. Average land, build and fees &amp; finance per unit by developer, against the investor exit price (tick) and open-market value (ring). Units-weighted across schemes.</p></div>
-        <div class="sfr-chart" id="cost-stack" data-source="schemes"></div>
+        <div><h2>Cost to build vs price achieved, per unit</h2><p class="sfr-note"><span class="t-region">All regions</span>. Your schemes: average land, build and fees &amp; finance per unit by developer, against the exit price (tick) and open-market value (ring). Units-weighted.</p></div>
+        <div class="sfr-chart" id="cost-stack"></div>
         <div class="sfr-legend" id="cost-legend"></div>
       </div>
       <div class="sfr-card" id="card-scatter">
-        <div><h2>Development cost vs exit price</h2><p class="sfr-note"><span class="t-scope">All regions, all developers</span>. Each dot is a scheme. Above the line, the developer makes a profit on the bulk sale.</p></div>
-        <div class="sfr-chart" id="cost-scatter" data-source="schemes"></div>
+        <div><h2>Development cost vs exit price</h2><p class="sfr-note"><span class="t-scope">All regions, all developers</span>. Each dot is one of your schemes. Above the line, the developer makes a profit on the sale.</p></div>
+        <div class="sfr-chart" id="cost-scatter"></div>
         <div class="sfr-legend" id="scatter-legend"></div>
       </div>
       <div class="sfr-card" id="card-spread">
-        <div><h2>Yield on cost vs exit yield</h2><p class="sfr-note"><span class="t-region">All regions</span>, by developer. The gap is the development spread an investor captures by forward-funding at cost rather than buying stabilised stock.</p></div>
-        <div class="sfr-chart" id="spread" data-source="schemes"></div>
+        <div><h2>Yield on cost vs exit yield</h2><p class="sfr-note"><span class="t-region">All regions</span>, by developer, from your schemes. The gap is the spread an investor captures by forward-funding at cost rather than buying stabilised stock.</p></div>
+        <div class="sfr-chart" id="spread"></div>
         <div class="sfr-legend" id="spread-legend"></div>
       </div>
     </div>
@@ -389,11 +428,11 @@ a { color: inherit; }
 </div>
 <section class="sfr-card wide site-foot" id="sources">
   <h2>Sources</h2>
-  <dl class="sfr-defs"><div><dt>Regional prices, rents and yields</dt><dd>Quarterly by region, 2019 Q1 to 2026 Q3: average semi-detached price and new-build price (HM Land Registry UK HPI, Aug 2026); semi-detached and 3-bed rent (ONS Price Index of Private Rents, Oct 2026); net yield after 25% operating costs (30% London); standard new-build house sales and houses in bulk deals (Land Registry Price Paid); private-sector completions (MHCLG Live Table 217). Forecasts to 2028 Q4 blend Knight Frank (Apr 2026) and Savills national price forecasts; the rent forecast is a trend assumption.</dd></div><div><dt>Land Registry bulk deals</dt><dd>5+ new-build houses on one street registered the same day to a non-private buyer (Price Paid category B), Jan 2019 to Aug 2026, with the local open-market new-build median and outcode coordinates (postcodes.io). Deals at 80%+ of local open market are classed as likely SFR/PRS.</dd></div><div><dt>Housebuilder reported metrics</dt><dd>Average selling prices, sales rates with and without bulk/PRS sales and completions from Barratt Redrow, Persimmon, Taylor Wimpey, Bellway and Vistry results (2025–2026), each with its source.</dd></div><div><dt>Council rents and prices by size</dt><dd>Quarterly, 2019 Q1 to 2026 Q3, for every council in eight English regions, the regions and England: rent by bedrooms and property type (ONS PIPR), average price by property type (UK HPI), standard new-build house sales and median price (Price Paid), houses in likely SFR bulk deals.</dd></div><div><dt>Sample SFR schemes</dt><dd>Illustrative schemes generated for the Development economics tab. Not real developments or company figures.</dd></div></dl>
+  <dl class="sfr-defs"><div><dt>Regional prices, rents and yields</dt><dd>Quarterly by region, 2019 Q1 to 2026 Q3: average semi-detached price and new-build price (HM Land Registry UK HPI, Aug 2026); semi-detached and 3-bed rent (ONS Price Index of Private Rents, Oct 2026); net yield after 25% operating costs (30% London); standard new-build house sales and houses in bulk deals (Land Registry Price Paid); private-sector completions (MHCLG Live Table 217). Forecasts to 2028 Q4 blend Knight Frank (Apr 2026) and Savills national price forecasts; the rent forecast is a trend assumption.</dd></div><div><dt>Land Registry bulk deals</dt><dd>5+ new-build houses on one street registered the same day to a non-private buyer (Price Paid category B), Jan 2019 to Aug 2026, with the local open-market new-build median and outcode coordinates (postcodes.io). Deals at 80%+ of local open market are classed as likely SFR/PRS.</dd></div><div><dt>Housebuilder reported metrics</dt><dd>Average selling prices, sales rates with and without bulk/PRS sales and completions from Barratt Redrow, Persimmon, Taylor Wimpey, Bellway and Vistry results (2025–2026), each with its source.</dd></div><div><dt>Council rents and prices by size</dt><dd>Quarterly, 2019 Q1 to 2026 Q3, for every council in eight English regions, the regions and England: rent by bedrooms and property type (ONS PIPR), average price by property type (UK HPI), standard new-build house sales and median price (Price Paid), houses in likely SFR bulk deals.</dd></div><div><dt>Housebuilder economics</dt><dd>Gross and operating margins, private and bulk/partner average selling prices, land cost as a share of ASP, land bank, build cost inflation and bulk or partner volumes from Barratt Redrow (FY26), Bellway (FY26), Persimmon, Taylor Wimpey and Vistry (H1 2026) results. Land shares marked derived are calculated from reported land values and plot counts.</dd></div></dl>
   <p class="sfr-note">Contains HM Land Registry data © Crown copyright and database right 2026, ONS and MHCLG data under the Open Government Licence v3.0. Developer figures from company announcements and press coverage. Built 2026-10-25.</p>
 </section>
 </div>
-<script>window.SFR_DATASETS = {"region_quarterly": {"file": "region_quarterly.json"}, "bulk_deals": {"file": "bulk_deals.json"}, "developer_metrics": {"file": "developer_metrics.json"}, "area_quarterly": {"file": "area_quarterly.json"}, "schemes": {"file": "schemes_sample.json"}};</script>
+<script>window.SFR_DATASETS = {"region_quarterly": {"file": "region_quarterly.json"}, "bulk_deals": {"file": "bulk_deals.json"}, "developer_metrics": {"file": "developer_metrics.json"}, "area_quarterly": {"file": "area_quarterly.json"}, "developer_economics": {"file": "developer_economics.json"}};</script>
 <script src="js/d3.v7.9.0.min.js"></script>
 <script src="js/dash-shim.js"></script>
 <script src="js/uk_regions.js"></script>
@@ -689,7 +728,7 @@ a { color: inherit; }
   $('#deal-type').addEventListener('change', (e) => { dealType = e.target.value; draw(); });
 
   function drawFilters() {
-    const rq = dash.data('region_quarterly'), dm = dash.data('developer_metrics'), sc = dash.data('schemes');
+    const rq = dash.data('region_quarterly'), dm = dash.data('developer_metrics'), sc = dash.data('developer_economics');
     const regions = rq.status === 'ok' ? REGION_ORDER.filter((r) => rq.data.some((x) => x.region === r)) : [];
     const devs = new Set([...(dm.status === 'ok' ? dm.data : []), ...(sc.status === 'ok' ? sc.data : []), ...(uploaded ? uploaded.rows : [])].map((r) => r.developer).filter((d) => d && d !== 'Market'));
     if (devs.size) devList = [...devs];
@@ -1050,6 +1089,148 @@ a { color: inherit; }
     legend($('#bulk-om-legend'), [{ label: 'Likely SFR bulk deals (median)', color: dash.colors[0], cls: 'line' }, { label: 'Standard new-build house sales (median)', color: dash.colors[2], cls: 'line' }]);
   }
 
+  // ---------- developer economics (reported) ----------
+  dash.calc('dev_unit_economics', {
+    title: 'Private sale price breakdown per home',
+    description: 'Per developer: private ASP split into land (land cost % of ASP × ASP), build and other cost of sales (ASP × (1 − gross margin) − land) and gross profit (ASP × gross margin), with the average bulk or partner price where reported. Developers without a land share or gross margin are left out.',
+    inputs: ['developer_economics'],
+    fn: (developer_economics) => developer_economics
+      .filter((r) => r.asp_private && r.gross_margin != null && r.land_cost_pct != null)
+      .map((r) => {
+        const land = Math.round(r.asp_private * r.land_cost_pct), profit = Math.round(r.asp_private * r.gross_margin);
+        return { developer: r.developer, period: r.period, asp_private: r.asp_private, land, build_other: r.asp_private - land - profit, gross_profit: profit,
+          asp_bulk: r.asp_bulk, asp_bulk_type: r.asp_bulk_type, land_cost_derived: r.land_cost_derived };
+      }),
+  });
+
+  function drawEconTable() {
+    const body = $('#econ-table tbody'), d = dash.data('developer_economics');
+    if (d.status !== 'ok') { body.replaceChildren(); return; }
+    const p = P();
+    body.replaceChildren(...d.data.map((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.developer; tr.dataset.dev = r.developer;
+      if (r.developer === p.developer) tr.className = 'sel';
+      const withPrior = (v, prior, f, title, cls) => {
+        const c = td(v == null ? '—' : f(v), 'num' + (cls ? ' ' + cls : ''));
+        if (v != null && prior != null) { const s = document.createElement('span'); s.className = 'sfr-prior'; s.textContent = ' (' + f(prior) + ')'; c.appendChild(s); }
+        if (title) c.title = title;
+        return c;
+      };
+      const land = withPrior(r.land_cost_pct, null, fmt.pct, r.land_cost_basis);
+      if (r.land_cost_derived && r.land_cost_pct != null) land.textContent += ' †';
+      const src = document.createElement('td');
+      const a = document.createElement('a'); a.textContent = /^Primary/.test(r.source_type) ? 'Results' : 'Report';
+      if (/^https:\/\//.test(r.source_url || '')) { a.href = r.source_url; a.target = '_blank'; a.rel = 'noopener'; }
+      a.title = r.source_type; src.appendChild(a);
+      tr.append(td(r.developer), td(r.period),
+        withPrior(r.gross_margin, r.gross_margin_prior, fmt.pct, r.gross_margin_basis),
+        withPrior(r.operating_margin, r.operating_margin_prior, fmt.pct, r.operating_margin_basis),
+        withPrior(r.asp_private, null, fmt.gbpk, r.asp_private_basis),
+        land,
+        withPrior(r.landbank_plots, null, fmt.int, r.landbank_basis, 'hide-sm'),
+        withPrior(r.build_inflation_short, null, String, r.build_inflation_text, 'hide-sm'),
+        withPrior(r.bulk_homes, null, fmt.int, r.bulk_homes_text, 'hide-sm'),
+        src);
+      return tr;
+    }));
+  }
+  $('#econ-table').addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    const tr = e.target.closest('tbody tr[data-key]'); if (tr) dash.setParams({ developer: P().developer === tr.dataset.dev ? 'All' : tr.dataset.dev });
+  });
+
+  function drawMargins() {
+    const el = $('#margin-chart'); if (!ready(el, ['developer_economics'])) { $('#margin-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P(), rows = dash.data('developer_economics').data;
+    const items = rows.flatMap((r) => [['gross_margin', 'Gross', dash.colors[0]], ['operating_margin', 'Operating', dash.colors[2]]]
+      .filter(([k]) => r[k] != null).map(([k, l, c]) => ({ dev: r.developer, kind: l, color: c, now: r[k], prior: r[k + '_prior'], basis: r[k + '_basis'], period: r.period, periodPrior: r.period_prior })));
+    const devs = rows.map((r) => r.developer);
+    const rowH = 46, H = devs.length * rowH + 26;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(devs, (d) => textWidth(svg, d))) + 12;
+    const ext = d3.extent(items.flatMap((i) => [i.now, i.prior]).filter((v) => v != null));
+    const x = d3.scaleLinear([Math.min(0, ext[0]), ext[1]], [left, W - 12]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left) / 70))).tickSize(-(H - 24)).tickFormat(d3.format('.0%'))).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    if (x.domain()[0] < 0) svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', H - 20).style('stroke', 'var(--cds-chart-reference)');
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(devs).join('g').attr('class', 'r').attr('transform', (d, i) => `translate(0,${i * rowH + 4})`)
+      .style('opacity', (d) => p.developer === 'All' || p.developer === d ? 1 : 0.35);
+    g.append('text').attr('x', left - 10).attr('y', 18).attr('dy', '0.32em').attr('text-anchor', 'end').text((d) => d);
+    for (const [kind, yOff] of [['Gross', 10], ['Operating', 26]]) {
+      const its = (d) => items.filter((i) => i.dev === d && i.kind === kind);
+      g.selectAll('line.' + kind).data((d) => its(d).filter((i) => i.prior != null)).join('line').attr('class', 'mk')
+        .attr('x1', (i) => x(i.prior)).attr('x2', (i) => x(i.now)).attr('y1', yOff).attr('y2', yOff).style('stroke', 'var(--cds-chart-muted)').style('stroke-width', 3);
+      g.selectAll('circle.p' + kind).data((d) => its(d).filter((i) => i.prior != null)).join('circle').attr('cx', (i) => x(i.prior)).attr('cy', yOff).attr('r', 4.5)
+        .style('fill', 'var(--color-panel)').style('stroke', (i) => i.color).style('stroke-width', 1.5);
+      g.selectAll('circle.n' + kind).data(its).join('circle').attr('class', 'mk').attr('cx', (i) => x(i.now)).attr('cy', yOff).attr('r', 5).style('fill', (i) => i.color);
+    }
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, d) => tt.show(e, d, items.filter((i) => i.dev === d).map((i) => ({ color: i.color, name: i.kind + ' ' + i.period, value: fmt.pct(i.now) + (i.prior != null ? ' (' + i.periodPrior + ' ' + fmt.pct(i.prior) + ')' : '') }))))
+      .on('pointerleave', () => tt.hide());
+    legend($('#margin-legend'), [{ label: 'Gross margin', color: dash.colors[0], cls: 'dot' }, { label: 'Operating margin', color: dash.colors[2], cls: 'dot' }]);
+  }
+
+  function drawBulkPrice() {
+    const el = $('#bulkprice-chart'); if (!ready(el, ['developer_economics'])) { $('#bulkprice-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P(), rows = dash.data('developer_economics').data.filter((r) => r.asp_bulk && r.asp_private);
+    const rowH = 54, H = rows.length * rowH + 26;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.developer)) || 0) + 12;
+    const right = Math.ceil(textWidth(svg, '−00% vs private')) + 8;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.asp_private)], [left, W - right]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left - right) / 70))).tickSize(-(H - 24)).tickFormat(fmt.gbpk)).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`)
+      .style('opacity', (r) => p.developer === 'All' || p.developer === r.developer ? 1 : 0.35);
+    g.append('text').attr('x', left - 10).attr('y', 12).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.developer);
+    g.append('text').attr('x', left - 10).attr('y', 28).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.asp_bulk_type.replace(' (affordable + PRS)', '')).style('font-size', '0.7rem');
+    g.append('rect').attr('class', 'mk').attr('x', left).attr('y', 4).attr('height', 13).attr('rx', 3).attr('width', (r) => x(r.asp_private) - left).style('fill', dash.colors[2]);
+    g.append('rect').attr('class', 'mk').attr('x', left).attr('y', 20).attr('height', 13).attr('rx', 3).attr('width', (r) => x(r.asp_bulk) - left).style('fill', (r) => r.asp_bulk_type === 'PRS' ? dash.colors[0] : 'var(--cds-chart-muted)');
+    g.append('text').attr('x', (r) => x(r.asp_private) + 6).attr('y', 20).attr('dy', '0.32em').text((r) => fmt.pct(r.asp_bulk / r.asp_private - 1) + ' vs private');
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.developer + ' · ' + r.period, [{ color: dash.colors[2], name: r.asp_private_basis, value: fmt.gbpk(r.asp_private) }, { color: r.asp_bulk_type === 'PRS' ? dash.colors[0] : 'var(--cds-chart-muted)', name: r.asp_bulk_type, value: fmt.gbpk(r.asp_bulk) }, { name: 'Difference', value: fmt.pct(r.asp_bulk / r.asp_private - 1) }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#bulkprice-legend'), [{ label: 'Private ASP', color: dash.colors[2] }, { label: 'PRS buyers', color: dash.colors[0] }, { label: 'Housing association, social or partner buyers', color: 'var(--cds-chart-muted)' }]);
+  }
+
+  function drawUnitEcon() {
+    const el = $('#unitecon-chart'); if (!ready(el, ['dev_unit_economics'])) { $('#unitecon-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P(), rows = [...dash.data('dev_unit_economics').data].sort((a, b) => b.asp_private - a.asp_private);
+    const rowH = 36, H = rows.length * rowH + 26;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.developer)) || 0) + 12;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.asp_private) || 1], [left, W - 56]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left) / 80))).tickSize(-(H - 24)).tickFormat(fmt.gbpk)).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const parts = [['land', 'Land', dash.colors[3]], ['build_other', 'Build & other costs', dash.colors[2]], ['gross_profit', 'Gross profit', dash.colors[0]]];
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`)
+      .style('opacity', (r) => p.developer === 'All' || p.developer === r.developer ? 1 : 0.35);
+    g.append('text').attr('x', left - 10).attr('y', 12).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.developer);
+    let acc = 0;
+    for (const [k, , c] of parts) {
+      const start = (r) => parts.slice(0, parts.findIndex((q) => q[0] === k)).reduce((a, q) => a + r[q[0]], 0);
+      g.append('rect').attr('class', 'mk').attr('y', 3).attr('height', 18).attr('x', (r) => x(start(r))).attr('width', (r) => Math.max(0, x(start(r) + r[k]) - x(start(r)))).style('fill', c);
+    }
+    g.append('text').attr('x', (r) => x(r.asp_private) + 6).attr('y', 12).attr('dy', '0.32em').text((r) => fmt.gbpk(r.asp_private));
+    g.filter((r) => r.asp_bulk).append('line').attr('x1', (r) => x(r.asp_bulk)).attr('x2', (r) => x(r.asp_bulk)).attr('y1', -1).attr('y2', 25).style('stroke', 'var(--color-fg)').style('stroke-width', 2.5);
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.developer + ' · ' + r.period, [
+        ...parts.map(([k, l, c]) => ({ color: c, name: l + (k === 'land' && r.land_cost_derived ? ' (derived)' : ''), value: fmt.gbpk(r[k]) + ' · ' + fmt.pct(r[k] / r.asp_private) })),
+        { name: 'Private ASP', value: fmt.gbpk(r.asp_private) },
+        ...(r.asp_bulk ? [{ name: r.asp_bulk_type + ' price', value: fmt.gbpk(r.asp_bulk) }] : [])]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#unitecon-legend'), [...parts.map(([, l, c]) => ({ label: l, color: c })), { label: 'Bulk / partner price', color: 'var(--color-fg)', cls: 'line' }]);
+  }
+
   // ---------- uploaded scheme data (this viewer's session only) ----------
   const UP_COLS = [
     ['scheme', true, ['scheme name', 'site', 'project', 'development', 'name']],
@@ -1192,13 +1373,13 @@ a { color: inherit; }
     setTimeout(() => { b.textContent = 'Copy column names'; }, 2000);
   });
 
-  const econReady = (el) => { if (uploaded) { el.classList.remove('dash-skeleton'); return true; } return ready(el, ['schemes']); };
-  const econRows = () => uploaded ? uploaded.rows : dash.data('schemes').data;
+  const econReady = (el) => { el.classList.remove('dash-skeleton'); return !!uploaded; };
+  const econRows = () => uploaded ? uploaded.rows : [];
   function drawUpload() {
     const on = !!uploaded;
     $('#up-clear').hidden = !on;
-    $('#econ-banner-label').textContent = on ? 'Your data' : 'Sample data';
-    $('#econ-banner-text').textContent = on ? 'Showing ' + uploaded.rows.length + ' schemes from ' + uploaded.name + ', in this browser only. Reload the page or press "Back to sample data" to return to the sample.' : 'Land and build costs per scheme are not published. These charts use illustrative schemes until you drop in your own appraisals or deal data below.';
+    $('#econ-banner').hidden = !on; $('#econ-schemes').hidden = !on;
+    $('#econ-banner-text').textContent = on ? 'The scheme charts below show ' + uploaded.rows.length + ' schemes from ' + uploaded.name + ', in this browser only. Reload the page or press "Clear my data" to remove them.' : '';
     const wrap = $('#up-preview-wrap'); wrap.hidden = !on;
     if (!on) return;
     const cols = [['scheme', String], ['developer', String], ['region', String], ['units', fmt.int], ['tdc_unit', fmt.gbpk], ['exit_price_unit', fmt.gbpk], ['rent_pcm', fmt.gbp], ['net_yield', fmt.pct2], ['yield_on_cost', fmt.pct2], ['profit_on_cost', fmt.pct]];
@@ -1467,7 +1648,7 @@ a { color: inherit; }
   }
 
   // ---------- tabs ----------
-  const pages = { overview: [drawMap, drawOverviewBars], pricing: [drawRates, drawAsp, drawDevTable, drawUnits, drawBulkOm, drawPriceLines], regions: [drawDeepDive], yields: [drawRentLines, drawYieldLines, drawOutlook], deals: [drawDealTable], economics: [drawUpload, drawCostStack, drawScatter, drawSpread] };
+  const pages = { overview: [drawMap, drawOverviewBars], pricing: [drawRates, drawAsp, drawDevTable, drawUnits, drawBulkOm, drawPriceLines], regions: [drawDeepDive], yields: [drawRentLines, drawYieldLines, drawOutlook], deals: [drawDealTable], economics: [drawEconTable, drawMargins, drawBulkPrice, drawUnitEcon, drawUpload, drawCostStack, drawScatter, drawSpread] };
   function show(id) {
     if (!pages[id]) return;
     page = id;
