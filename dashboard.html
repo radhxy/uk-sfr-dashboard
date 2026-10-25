@@ -1,0 +1,1436 @@
+<style>
+.sfr { display: grid; gap: var(--cds-gap-lg); font-family: var(--font-anthropic-sans); font-variant-numeric: tabular-nums; }
+.sfr-head { display: grid; gap: var(--cds-gap-sm); }
+.sfr-head h1 { margin: 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); text-wrap: balance; }
+.sfr-take { margin: 0; max-width: 72ch; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); line-height: 1.5; }
+.sfr .sfr-take b { color: var(--color-fg); font-weight: 500; }
+.sfr-banner { display: flex; gap: var(--cds-gap-sm); align-items: baseline; padding: var(--cds-pad-sm) var(--cds-pad-md); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.45; }
+.sfr-banner strong { color: var(--color-warn); font-weight: 600; white-space: nowrap; }
+.sfr-filters { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); align-items: end; }
+.sfr-filters label { display: grid; gap: 2px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sfr-filters select, .sfr-search, .sfr-metric { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); min-width: 11rem; max-width: 100%; }
+.sfr-btn { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: transparent; border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-md); cursor: pointer; }
+.sfr-btn:hover { background: var(--color-panel); }
+.sfr-btn:focus-visible, .sfr-tab:focus-visible, .sfr th button:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.sfr-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10.5rem), 1fr)); gap: var(--cds-gap-md); }
+.sfr-kpi { display: grid; gap: var(--cds-gap-xs); align-content: start; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); }
+.sfr-kpi .lbl { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sfr .sfr-kpi .val { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.15; }
+.sfr-kpi .sub { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); min-height: 1.2em; }
+.sfr-up { color: var(--color-ok); } .sfr-down { color: var(--color-bad); }
+.sfr-tabs { display: flex; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); overflow-x: auto; }
+.sfr-tab { font: inherit; font-size: var(--cds-font-size-body); background: none; border: 0; border-bottom: 2px solid transparent; color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; white-space: nowrap; }
+.sfr-tab[aria-selected="true"] { color: var(--color-fg); border-bottom-color: var(--color-fg); }
+.sfr-page { display: grid; gap: var(--cds-gap-md); }
+.sfr-page[hidden] { display: none; }
+.sfr-drop { display: grid; gap: var(--cds-gap-xs); justify-items: center; text-align: center; padding: var(--cds-pad-xl) var(--cds-pad-lg); border: 1.5px dashed var(--color-border-line); border-radius: var(--cds-radius); cursor: pointer; transition: border-color var(--cds-dur-slow), background var(--cds-dur-slow); }
+.sfr-drop:hover, .sfr-drop.over { border-color: var(--color-fg); background: color-mix(in srgb, var(--color-fg) 4%, transparent); }
+.sfr-drop:focus-within { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.sfr-drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.sfr-drop-main { font-size: var(--cds-font-size-body); font-weight: 500; }
+.sfr-cols summary { cursor: pointer; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sfr-cols[open] { display: grid; gap: var(--cds-gap-sm); }
+.sfr-chips { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs); }
+.sfr-chip { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg-muted); background: transparent; border: 1px solid var(--color-border-line); border-radius: 999px; padding: var(--cds-pad-xs) var(--cds-pad-md); cursor: pointer; }
+.sfr-chip:hover { color: var(--color-fg); }
+.sfr-chip[aria-selected="true"] { color: var(--color-bg); background: var(--color-fg); border-color: var(--color-fg); }
+.sfr-chip:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.sfr-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); }
+.sfr-card { position: relative; min-width: 0; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); display: grid; gap: var(--cds-gap-sm); align-content: start; }
+.sfr-card.wide { grid-column: 1 / -1; }
+.sfr-card h2 { margin: 0; font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); }
+.sfr-note { margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.45; }
+.sfr-cardhead { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm); justify-content: space-between; align-items: start; }
+.sfr-cardhead > div { display: grid; gap: var(--cds-gap-xs); min-width: 0; }
+.sfr-chart { position: relative; min-height: 280px; }
+.sfr-chart.tall { min-height: 460px; }
+.sfr-chart svg { display: block; overflow: visible; }
+.sfr-chart text { fill: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+.sfr-chart .grid line { stroke: var(--cds-chart-grid); }
+.sfr-chart .grid path, .sfr-chart .axis path { stroke: var(--cds-chart-axis); }
+.sfr-chart .axis line { stroke: none; }
+.sfr-legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sfr-legend span { display: inline-flex; gap: 6px; align-items: center; }
+.sfr-legend i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+.sfr-legend i.line { height: 2px; border-radius: 1px; }
+.sfr-legend i.dash { height: 0; border-top: 2px dashed var(--color-fg-muted); border-radius: 0; background: none !important; }
+.sfr-legend i.dot { border-radius: 50%; }
+.sfr-tip { position: absolute; z-index: 5; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); line-height: 1.5; min-width: 9rem; max-width: 17rem; }
+.sfr-tip .t { color: var(--cds-text-secondary); }
+.sfr-tip .r { display: flex; gap: 6px; align-items: center; justify-content: space-between; }
+.sfr-tip .r span:first-child { display: inline-flex; gap: 6px; align-items: center; }
+.sfr-tip i { width: 8px; height: 8px; border-radius: 2px; display: inline-block; }
+.sfr-tablewrap { overflow: auto; max-height: 34rem; }
+.sfr table { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-body); }
+.sfr th { position: sticky; top: 0; background: var(--color-panel); text-align: left; font-weight: 500; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); border-bottom: 1px solid var(--color-border-line); padding: 0; white-space: nowrap; }
+.sfr th button { font: inherit; color: inherit; background: none; border: 0; padding: var(--cds-pad-xs) var(--cds-pad-sm); cursor: pointer; width: 100%; text-align: inherit; }
+.sfr th.num, .sfr td.num { text-align: right; }
+.sfr td { padding: var(--cds-pad-xs) var(--cds-pad-sm); border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+.sfr tr.sel td { background: color-mix(in srgb, var(--color-fg) 6%, transparent); }
+.sfr tbody tr[data-key] { cursor: pointer; }
+.sfr tbody tr:hover td { background: color-mix(in srgb, var(--color-fg) 4%, transparent); }
+.sfr-pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: var(--cds-font-size-caption); border: 1px solid var(--color-border-line); }
+.sfr-pill.op { color: var(--color-ok); } .sfr-pill.uc { color: var(--color-warn); } .sfr-pill.pl { color: var(--color-fg-muted); }
+.sfr-bar { display: inline-block; height: 6px; border-radius: 3px; background: var(--cds-chart-muted); vertical-align: middle; margin-left: 6px; }
+.sfr-failed { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.sfr-failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.sfr [data-dash-source-state=empty] { color: transparent; }
+.sfr [data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+.sfr-defs { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 18rem), 1fr)); gap: var(--cds-gap-sm) var(--cds-gap-lg); margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.45; }
+.sfr-defs dt { color: var(--color-fg); font-weight: 500; }
+.sfr-defs dd { margin: 0; }
+@media (max-width: 640px) { .sfr .hide-sm { display: none; } }
+@media (prefers-reduced-motion: no-preference) {
+  .sfr-chart.anim svg .mk { animation: sfr-in var(--cds-dur-slow) var(--cds-ease-out) both; }
+  @keyframes sfr-in { from { opacity: 0; } to { opacity: 1; } }
+}
+</style>
+
+<div class="sfr">
+  <header class="sfr-head" id="top">
+    <h1>UK SFR Market Monitor</h1>
+    <p class="sfr-take" id="takeaway">
+      <span class="t-region">All regions</span>, <b class="dash-skeleton" data-source="kpi" data-field="latest_quarter" data-k="kpi">—</b>:
+      semi-detached houses rent for <b class="dash-skeleton" data-source="kpi" data-field="rent_pcm" data-k="kpi">—</b> a month against an average price of
+      <b class="dash-skeleton" data-source="kpi" data-field="price" data-k="kpi">—</b>, a net yield of
+      <b class="dash-skeleton" data-source="kpi" data-field="net_yield" data-k="kpi">—</b>.
+      In the four complete quarters to <b class="dash-skeleton" data-source="kpi" data-field="deals_to_quarter" data-k="kpi">—</b>,
+      <b class="dash-skeleton" data-source="kpi" data-field="bulk_houses" data-k="kpi">—</b> new-build houses were bought in likely SFR bulk deals at a median
+      <b class="dash-skeleton" data-source="kpi" data-field="bulk_price" data-k="kpi">—</b>,
+      <b class="dash-skeleton" data-source="kpi" data-field="bulk_discount" data-k="kpi">—</b> below local open-market new-build prices.
+    </p>
+    <div class="sfr-banner" role="note"><strong>Public data</strong><span>Prices, rents, bulk deals and housebuilding come from ONS, HM Land Registry and MHCLG; developer figures from company results. Net yields assume operating costs of 25% of rent (30% in London). Price forecasts blend Knight Frank and Savills national forecasts; rent forecasts are a trend assumption. The Development economics tab is still sample data.</span></div>
+    <div class="sfr-filters">
+      <label for="f-region">Region<select id="f-region" data-source="region_quarterly"></select></label>
+      <label for="f-dev">Developer<select id="f-dev" data-source="developer_metrics schemes"></select></label>
+      <button class="sfr-btn" id="f-reset" type="button">Reset</button>
+    </div>
+  </header>
+
+  <section class="sfr-kpis" id="kpis" aria-label="Headline figures">
+    <div class="sfr-kpi" id="kpi-ny"><span class="lbl">Net yield · semi-detached house</span><b class="val dash-skeleton" data-source="kpi" data-field="net_yield" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="net_yield_change" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
+    <div class="sfr-kpi" id="kpi-rent"><span class="lbl">Average rent · semi-detached</span><b class="val dash-skeleton" data-source="kpi" data-field="rent_pcm" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="rent_12m" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
+    <div class="sfr-kpi" id="kpi-price"><span class="lbl">Average price · semi-detached</span><b class="val dash-skeleton" data-source="kpi" data-field="price" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="price_12m" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
+    <div class="sfr-kpi" id="kpi-units"><span class="lbl">Houses in SFR bulk deals · 4 quarters</span><b class="val dash-skeleton" data-source="kpi" data-field="bulk_houses" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="bulk_houses_change" data-k="kpi" data-dir="1">—</span> vs prior 4 quarters</span></div>
+    <div class="sfr-kpi" id="kpi-bulk"><span class="lbl">Median bulk-deal price per house</span><b class="val dash-skeleton" data-source="kpi" data-field="bulk_price" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="bulk_discount" data-k="kpi">—</span> below local open market</span></div>
+    <div class="sfr-kpi" id="kpi-comp"><span class="lbl">Private homes completed · 4 quarters</span><b class="val dash-skeleton" data-source="kpi" data-field="completions" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="completions_change" data-k="kpi" data-dir="1">—</span> vs prior 4 quarters</span></div>
+  </section>
+
+  <nav class="sfr-tabs" role="tablist" aria-label="Sections">
+    <button class="sfr-tab" role="tab" id="tab-overview" data-page="overview" aria-selected="true">Overview &amp; map</button>
+    <button class="sfr-tab" role="tab" id="tab-pricing" data-page="pricing" aria-selected="false">Developers &amp; sales</button>
+    <button class="sfr-tab" role="tab" id="tab-regions" data-page="regions" aria-selected="false">Region deep dive</button>
+    <button class="sfr-tab" role="tab" id="tab-yields" data-page="yields" aria-selected="false">Rents &amp; yields</button>
+    <button class="sfr-tab" role="tab" id="tab-deals" data-page="deals" aria-selected="false">Bulk deals</button>
+    <button class="sfr-tab" role="tab" id="tab-economics" data-page="economics" aria-selected="false">Development economics</button>
+  </nav>
+
+  <section class="sfr-page" id="overview" data-page="overview">
+    <div class="sfr-grid">
+      <div class="sfr-card" id="card-map">
+        <div class="sfr-cardhead">
+          <div><h2>Where SFR bulk deals happen</h2><p class="sfr-note">Regions shaded by the chosen metric, latest quarter. Dots are bulk purchases of 5+ new-build houses on one street, sized by houses (Land Registry, 2019 onwards). Click a region to filter.</p></div>
+          <div class="sfr-filters">
+            <label for="map-metric">Shade by<select id="map-metric" class="sfr-metric">
+              <option value="net_yield">Net yield</option><option value="median_price">Semi-detached price</option>
+              <option value="rent_pcm">Semi-detached rent (pcm)</option><option value="rent_12m">Rent growth, 12 months</option>
+            </select></label>
+            <label for="map-deals">Deals<select id="map-deals" class="sfr-metric">
+              <option value="sfr">Likely SFR/PRS</option><option value="all">All bulk deals</option><option value="none">None</option>
+            </select></label>
+          </div>
+        </div>
+        <div class="sfr-chart tall" id="map" data-source="region_quarterly region_growth bulk_deals"></div>
+        <div class="sfr-legend" id="map-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-region-bars">
+        <div><h2>Net yield by region</h2><p class="sfr-note">Semi-detached house rent less 25% operating costs (30% in London), over the average semi-detached price, latest quarter.</p></div>
+        <div class="sfr-chart" id="region-bars" data-source="region_quarterly"></div>
+        <div><h2>Rent vs price growth</h2><p class="sfr-note">Semi-detached houses, change over the last 12 months. Where rents outrun prices, yields are widening.</p></div>
+        <div class="sfr-chart" id="growth-bars" data-source="region_growth"></div>
+        <div class="sfr-legend" id="growth-legend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sfr-page" id="pricing" data-page="pricing" hidden>
+    <div class="sfr-grid">
+      <div class="sfr-card" id="card-rates">
+        <div><h2>Sales rates with and without bulk deals</h2><p class="sfr-note">Private reservations per outlet per week, latest reported period. The gap is what bulk and PRS sales add to each developer's velocity.</p></div>
+        <div class="sfr-chart" id="rate-bars" data-source="developer_metrics"></div>
+        <div class="sfr-legend" id="rate-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-asp">
+        <div><h2>Average selling price</h2><p class="sfr-note">Latest reported period, all tenures unless stated. Mix-driven: regions and house sizes differ by developer.</p></div>
+        <div class="sfr-chart" id="asp-bars" data-source="developer_metrics"></div>
+      </div>
+      <div class="sfr-card wide" id="card-dev-table">
+        <div><h2>What developers report</h2><p class="sfr-note">From results announcements and press coverage. "Primary" means the company's own announcement. Click a row to filter by that developer.</p></div>
+        <div class="sfr-tablewrap"><table id="dev-table" data-source="developer_metrics" data-row-key="developer,period,metric">
+          <thead><tr>
+            <th data-field="developer"><button type="button" data-sort="developer">Developer</button></th>
+            <th data-field="period"><button type="button" data-sort="period">Period</button></th>
+            <th data-field="metric"><button type="button" data-sort="metric">Metric</button></th>
+            <th class="num" data-field="value"><button type="button" data-sort="value">Value</button></th>
+            <th class="hide-sm" data-field="note">Note</th>
+            <th data-field="source_type"><button type="button" data-sort="source_type">Source</button></th>
+          </tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="sfr-card wide" id="card-units">
+        <div><h2>Houses bought in bulk deals per quarter</h2><p class="sfr-note"><span class="t-region">All regions</span>. New-build houses bought 5+ at a time on one street by a non-private buyer. Shaded quarters are still being registered, so their counts will rise.</p></div>
+        <div class="sfr-chart" id="units-bars" data-source="bulk_deals region_quarterly"></div>
+        <div class="sfr-legend" id="units-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-bulk-om">
+        <div><h2>Bulk-deal price vs open market</h2><p class="sfr-note"><span class="t-region">All regions</span>. Median price per house in likely SFR bulk deals against standard new-build house sales, by year.</p></div>
+        <div class="sfr-chart" id="bulk-om" data-source="bulk_deals region_quarterly"></div>
+        <div class="sfr-legend" id="bulk-om-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-price">
+        <div><h2>Average semi-detached house price</h2><p class="sfr-note">UK House Price Index by region, with a forecast to the end of 2028 (dashed) blending Knight Frank and Savills national forecasts.</p></div>
+        <div class="sfr-chart" id="price-lines" data-source="region_quarterly"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sfr-page" id="regions" data-page="regions" hidden>
+    <div class="sfr-chips" id="dd-regions" role="tablist" aria-label="Region"></div>
+    <div class="sfr-filters sfr-dd-controls">
+      <label for="dd-area">Area<select id="dd-area" data-source="area_snapshot"></select></label>
+      <label for="dd-dim">Compare by<select id="dd-dim"><option value="type">Property type</option><option value="bedrooms">Bedrooms</option></select></label>
+      <label for="dd-metric">Metric<select id="dd-metric"></select></label>
+      <label for="dd-size">Size for council table<select id="dd-size"></select></label>
+    </div>
+    <div class="sfr-grid">
+      <div class="sfr-card wide" id="card-dd-sizes">
+        <div><h2 id="dd-sizes-title">By house size</h2><p class="sfr-note">Latest quarter for rents and prices. New-build figures cover standard (non-bulk) sales of new houses in the four fully registered quarters to <span id="dd-nb-q">—</span>. ONS and Land Registry don't publish prices by bedroom count, so price and yield are shown by property type only.</p></div>
+        <div class="sfr-tablewrap"><table id="dd-size-table"><thead><tr>
+          <th>Size</th><th class="num">Rent pcm</th><th class="num">Rent 12m</th><th class="num hide-sm">Rent 3y</th>
+          <th class="num">Avg price</th><th class="num">Price 12m</th><th class="num">Gross yield</th><th class="num hide-sm">Net yield</th>
+          <th class="num hide-sm">New-build median</th><th class="num hide-sm">New-build sales</th>
+        </tr></thead><tbody></tbody></table></div>
+      </div>
+      <div class="sfr-card wide" id="card-dd-trend">
+        <div><h2 id="dd-trend-title">Trend by size</h2><p class="sfr-note" id="dd-trend-note">Quarterly averages since 2019.</p></div>
+        <div class="sfr-chart" id="dd-trend" data-source="area_quarterly"></div>
+        <div class="sfr-legend" id="dd-trend-legend"></div>
+      </div>
+      <div class="sfr-card wide" id="card-dd-rank">
+        <div><h2 id="dd-rank-title">Councils ranked</h2><p class="sfr-note" id="dd-rank-note">Click a bar to open that council.</p></div>
+        <div class="sfr-chart" id="dd-rank" data-source="area_snapshot"></div>
+      </div>
+      <div class="sfr-card wide" id="card-dd-councils">
+        <div class="sfr-cardhead">
+          <div><h2 id="dd-table-title">Councils</h2><p class="sfr-note">Figures for the size picked above. Click a row to open it. SFR deals count new-build houses in likely SFR/PRS bulk deals since 2019.</p></div>
+          <input id="dd-search" class="sfr-search" type="search" placeholder="Search councils" aria-label="Search councils">
+        </div>
+        <div class="sfr-tablewrap"><table id="dd-table" data-source="area_snapshot" data-row-key="area_code"><thead><tr>
+          <th data-field="area_name"><button type="button" data-sort="area_name">Area</button></th>
+          <th class="num" data-col="rent_now"><button type="button" data-sort="rent_now">Rent pcm</button></th>
+          <th class="num" data-col="rent_12m"><button type="button" data-sort="rent_12m">Rent 12m</button></th>
+          <th class="num hide-sm" data-col="rent_3y"><button type="button" data-sort="rent_3y">Rent 3y</button></th>
+          <th class="num" data-col="price_now"><button type="button" data-sort="price_now">Avg price</button></th>
+          <th class="num hide-sm" data-col="price_12m"><button type="button" data-sort="price_12m">Price 12m</button></th>
+          <th class="num" data-col="gross_yield"><button type="button" data-sort="gross_yield">Gross yield</button></th>
+          <th class="num hide-sm" data-col="nb_median"><button type="button" data-sort="nb_median">New-build median</button></th>
+          <th class="num hide-sm" data-col="nb_sales"><button type="button" data-sort="nb_sales">New-build sales</button></th>
+          <th class="num" data-field="sfr_bulk_houses_total"><button type="button" data-sort="sfr_bulk_houses_total">SFR deals</button></th>
+        </tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sfr-page" id="yields" data-page="yields" hidden>
+    <div class="sfr-grid">
+      <div class="sfr-card wide" id="card-rent">
+        <div><h2>Average semi-detached house rent</h2><p class="sfr-note">ONS Price Index of Private Rents, monthly rent across all tenancies, by region. Dashed lines are a trend assumption: the latest 12-month growth easing to 3% a year by end-2028, with a ±1.5-point band for the selected region.</p></div>
+        <div class="sfr-chart" id="rent-lines" data-source="region_quarterly"></div>
+      </div>
+      <div class="sfr-card wide" id="card-yield">
+        <div><h2>Net yield over time</h2><p class="sfr-note">Semi-detached rent less operating costs, over the average semi-detached price. The forecast combines the rent assumption with the blended price forecast.</p></div>
+        <div class="sfr-chart" id="yield-lines" data-source="region_quarterly"></div>
+      </div>
+      <div class="sfr-card wide" id="card-outlook">
+        <div><h2>Outlook to end-2028</h2><p class="sfr-note">Latest actual quarter against the forecast for the last quarter of 2028.</p></div>
+        <div class="sfr-tablewrap"><table id="outlook-table" data-source="region_growth" data-row-key="region">
+          <thead><tr>
+            <th data-field="region">Region</th>
+            <th class="num" data-field="rent_now">Rent now</th>
+            <th class="num" data-field="rent_fc">Rent 2028</th>
+            <th class="num hide-sm" data-field="rent_fc_growth">Rent growth</th>
+            <th class="num" data-field="net_yield_now">Net yield now</th>
+            <th class="num" data-field="net_yield_fc">Net yield 2028</th>
+            <th class="num hide-sm" data-field="price_fc_growth">Price growth</th>
+          </tr></thead><tbody></tbody></table></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sfr-page" id="deals" data-page="deals" hidden>
+    <div class="sfr-card wide" id="card-deals">
+      <div class="sfr-cardhead">
+        <div><h2>Bulk deals</h2><p class="sfr-note"><span class="t-region">All regions</span>. <span id="deal-count"></span> A deal at 80% or more of the local open-market new-build price is counted as likely SFR/PRS; cheaper ones are likely affordable homes sold to housing associations.</p></div>
+        <div class="sfr-filters">
+          <label for="deal-type">Type<select id="deal-type" class="sfr-metric"><option value="sfr">Likely SFR/PRS</option><option value="all">All bulk deals</option><option value="rp">Likely affordable/RP</option></select></label>
+          <input id="deal-search" class="sfr-search" type="search" placeholder="Search street, town, council" aria-label="Search deals">
+        </div>
+      </div>
+      <div class="sfr-tablewrap"><table id="deal-table" data-source="bulk_deals" data-row-key="deal_id">
+        <thead><tr>
+          <th data-field="date"><button type="button" data-sort="date">Date</button></th>
+          <th data-field="street"><button type="button" data-sort="street">Street</button></th>
+          <th data-field="town"><button type="button" data-sort="town">Town</button></th>
+          <th class="hide-sm" data-field="region"><button type="button" data-sort="region">Region</button></th>
+          <th class="hide-sm" data-field="deal_type"><button type="button" data-sort="deal_type">Type</button></th>
+          <th class="num" data-field="houses"><button type="button" data-sort="houses">Houses</button></th>
+          <th class="num" data-field="median_price"><button type="button" data-sort="median_price">Median price</button></th>
+          <th class="num hide-sm" data-field="local_om_median"><button type="button" data-sort="local_om_median">Local open market</button></th>
+          <th class="num" data-field="price_vs_local_om"><button type="button" data-sort="price_vs_local_om">vs open market</button></th>
+        </tr></thead><tbody></tbody></table></div>
+      <p class="sfr-note">Land Registry does not name the buyer or the developer. Portfolio sales registered as one transaction do not appear here, so this undercounts institutional SFR buying.</p>
+    </div>
+  </section>
+
+  <section class="sfr-page" id="economics" data-page="economics" hidden>
+    <div class="sfr-banner" role="note" id="econ-banner"><strong id="econ-banner-label">Sample data</strong><span id="econ-banner-text">Land and build costs per scheme are not published. These charts use illustrative schemes until you drop in your own appraisals or deal data below.</span></div>
+    <div class="sfr-card wide" id="card-upload">
+      <div class="sfr-cardhead">
+        <div><h2>Your scheme data</h2><p class="sfr-note">Drop an Excel (.xlsx) or CSV file with one row per scheme and the charts below recalculate from it. The file is read in your browser and goes nowhere else: it lasts until you reload the page, and other viewers keep seeing the sample. To keep it on the dashboard for everyone, send the file to Claude in chat.</p></div>
+        <button class="sfr-btn" id="up-clear" type="button" hidden>Back to sample data</button>
+      </div>
+      <label class="sfr-drop" id="up-drop" for="up-file">
+        <input id="up-file" type="file" accept=".xlsx,.csv,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+        <span class="sfr-drop-main">Drop a spreadsheet here, or click to choose one</span>
+        <span class="sfr-note" id="up-status">First sheet only. The first row must hold column names.</span>
+      </label>
+      <details class="sfr-cols">
+        <summary>Columns it reads</summary>
+        <div class="sfr-tablewrap"><table><thead><tr><th>Column</th><th>Needed</th><th>Also recognised as</th></tr></thead><tbody id="up-cols"></tbody></table></div>
+        <p class="sfr-note">Costs and values are per unit. A column whose name includes "total", or GDV, is divided by units. Without separate land, build and fees columns, a total development cost column is drawn as one block. Region names follow the dashboard's (e.g. "Yorkshire &amp; Humber"); common variants are matched.</p>
+        <button class="sfr-btn" id="up-copy" type="button">Copy column names</button>
+      </details>
+      <div class="sfr-tablewrap" id="up-preview-wrap" hidden><table id="up-preview"><thead></thead><tbody></tbody></table></div>
+    </div>
+    <div class="sfr-grid">
+      <div class="sfr-card wide" id="card-stack">
+        <div><h2>Cost to build vs price achieved, per unit</h2><p class="sfr-note"><span class="t-region">All regions</span>. Average land, build and fees &amp; finance per unit by developer, against the investor exit price (tick) and open-market value (ring). Units-weighted across schemes.</p></div>
+        <div class="sfr-chart" id="cost-stack" data-source="schemes"></div>
+        <div class="sfr-legend" id="cost-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-scatter">
+        <div><h2>Development cost vs exit price</h2><p class="sfr-note"><span class="t-scope">All regions, all developers</span>. Each dot is a scheme. Above the line, the developer makes a profit on the bulk sale.</p></div>
+        <div class="sfr-chart" id="cost-scatter" data-source="schemes"></div>
+        <div class="sfr-legend" id="scatter-legend"></div>
+      </div>
+      <div class="sfr-card" id="card-spread">
+        <div><h2>Yield on cost vs exit yield</h2><p class="sfr-note"><span class="t-region">All regions</span>, by developer. The gap is the development spread an investor captures by forward-funding at cost rather than buying stabilised stock.</p></div>
+        <div class="sfr-chart" id="spread" data-source="schemes"></div>
+        <div class="sfr-legend" id="spread-legend"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sfr-card wide" id="definitions">
+    <h2>Definitions</h2>
+    <dl class="sfr-defs">
+      <div><dt>Bulk deal</dt><dd>Five or more new-build houses on one street, registered on the same day to a non-private buyer (Land Registry category B). Likely SFR/PRS when the median price is at least 80% of local open-market new-build prices.</dd></div>
+      <div><dt>Discount to open market</dt><dd>One minus the deal's median price over the median standard new-build house price in the same council and year, weighted by houses.</dd></div>
+      <div><dt>Net yield</dt><dd>Annual semi-detached rent (ONS) less operating costs of 25% (30% in London), divided by the average semi-detached price (UK HPI). ONS rents cover all tenancies, so they trail new-let rents on new SFR stock.</dd></div>
+      <div><dt>Yield on cost</dt><dd>Net rent divided by total development cost (land, build, fees and finance). The return if you fund the scheme at cost.</dd></div>
+      <div><dt>Profit on cost</dt><dd>Developer's margin on the bulk sale: exit price less total development cost, over total development cost.</dd></div>
+      <div><dt>Sales rate</dt><dd>Open-market reservations per sales outlet per week. Housebuilders report it as their main velocity measure.</dd></div>
+    </dl>
+  </section>
+</div>
+
+<script src="uk_regions.js"></script>
+<script>
+(() => {
+  const REGION_ORDER = ['London', 'South East', 'East of England', 'West Midlands', 'East Midlands', 'North West', 'Yorkshire & Humber', 'North East'];
+  const K = Math.cos(53 * Math.PI / 180);
+  const $ = (s) => document.querySelector(s);
+  const fmt = {
+    gbp: (v) => v == null ? '—' : '£' + d3.format(',')(Math.round(v)),
+    gbpk: (v) => v == null ? '—' : v >= 1e6 ? '£' + (v / 1e6).toFixed(2) + 'm' : '£' + Math.round(v / 1000) + 'k',
+    pct: (v) => v == null ? '—' : d3.format('.1%')(v),
+    pct2: (v) => v == null ? '—' : d3.format('.2%')(v),
+    spct: (v) => v == null ? '—' : (v > 0 ? '+' : '') + d3.format('.1%')(v),
+    int: (v) => v == null ? '—' : d3.format(',')(Math.round(v)),
+    dec2: (v) => v == null ? '—' : d3.format('.2f')(v),
+  };
+  const enc = (o) => Object.entries(o).map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v)).join('&');
+
+  // ---------- calculations ----------
+  dash.calc('kpi', {
+    title: 'Headline figures by region',
+    description: 'Latest-quarter price, rent and net yield with their 12-month change; houses in likely SFR bulk deals over the last four fully registered quarters; private completions over the last four quarters. All is the average (or total) of the eight regions.',
+    inputs: ['region_quarterly', 'bulk_deals'],
+    fn: (region_quarterly, bulk_deals) => {
+      const act = region_quarterly.filter((r) => r.basis === 'Actual');
+      const uniq = (a) => [...new Set(a)].sort();
+      const periods = uniq(act.map((r) => r.period));
+      const last = periods[periods.length - 1], yago = periods[periods.length - 5];
+      const comp = uniq(act.filter((r) => r.sales_complete).map((r) => r.period));
+      const c4 = comp.slice(-4), p4 = comp.slice(-8, -4);
+      const pc = uniq(act.filter((r) => r.pe_completions != null).map((r) => r.period));
+      const k4 = pc.slice(-4), kp4 = pc.slice(-8, -4);
+      const qStart = (d) => d.slice(0, 4) + '-' + String((Math.ceil(+d.slice(5, 7) / 3) - 1) * 3 + 1).padStart(2, '0') + '-01';
+      const label = (p) => act.find((r) => r.period === p).quarter;
+      const mean = (a) => a.length ? a.reduce((s, v) => s + v, 0) / a.length : null;
+      const sum = (a) => a.reduce((s, v) => s + v, 0);
+      const med = (a) => { if (!a.length) return null; const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+      const r4 = (v) => v == null || Number.isNaN(v) ? null : Math.round(v * 10000) / 10000;
+      const r0 = (v) => v == null ? null : Math.round(v);
+      const regions = ['All', ...uniq(act.map((r) => r.region))];
+      return regions.map((region) => {
+        const rows = act.filter((r) => region === 'All' || r.region === region);
+        const at = (p, f) => mean(rows.filter((r) => r.period === p && r[f] != null).map((r) => r[f]));
+        const price = at(last, 'median_price'), rent = at(last, 'rent_pcm'), ny = at(last, 'net_yield');
+        const deals = bulk_deals.filter((d) => d.deal_type === 'Likely SFR/PRS' && (region === 'All' || d.region === region));
+        const cur = deals.filter((d) => c4.includes(qStart(d.date))), prev = deals.filter((d) => p4.includes(qStart(d.date)));
+        const houses = sum(cur.map((d) => d.houses)), housesPrev = sum(prev.map((d) => d.houses));
+        const compl = (ps) => sum(rows.filter((r) => ps.includes(r.period) && r.pe_completions != null).map((r) => r.pe_completions));
+        const cNow = compl(k4), cPrev = compl(kp4);
+        return {
+          region, latest_quarter: label(last), deals_to_quarter: label(c4[c4.length - 1]),
+          price: r0(price), price_12m: r4(price / at(yago, 'median_price') - 1),
+          rent_pcm: r0(rent), rent_12m: r4(rent / at(yago, 'rent_pcm') - 1),
+          net_yield: r4(ny), net_yield_change: r4(ny - at(yago, 'net_yield')),
+          bulk_houses: houses, bulk_houses_change: housesPrev ? r4(houses / housesPrev - 1) : null,
+          bulk_price: r0(med(cur.map((d) => d.median_price))),
+          bulk_discount: houses ? r4(sum(cur.map((d) => (1 - d.price_vs_local_om) * d.houses)) / houses) : null,
+          completions: cNow || null, completions_change: cPrev ? r4(cNow / cPrev - 1) : null,
+        };
+      });
+    },
+  });
+
+  dash.calc('region_growth', {
+    title: 'Regional growth and outlook',
+    description: 'Per region: 12-month change in semi-detached price and rent to the latest actual quarter, and the forecast for the last forecast quarter.',
+    inputs: ['region_quarterly'],
+    fn: (region_quarterly) => {
+      const regions = [...new Set(region_quarterly.map((r) => r.region))];
+      const r4 = (v) => Math.round(v * 10000) / 10000;
+      return regions.map((region) => {
+        const rows = region_quarterly.filter((r) => r.region === region).sort((a, b) => a.period < b.period ? -1 : 1);
+        const act = rows.filter((r) => r.basis === 'Actual');
+        const now = act[act.length - 1], yearAgo = act[act.length - 5], fc = rows[rows.length - 1];
+        return {
+          region, quarter_now: now.quarter, quarter_fc: fc.quarter,
+          price_12m: r4(now.median_price / yearAgo.median_price - 1),
+          rent_12m: r4(now.rent_pcm / yearAgo.rent_pcm - 1),
+          rent_now: now.rent_pcm, rent_fc: fc.rent_pcm, rent_fc_growth: r4(fc.rent_pcm / now.rent_pcm - 1),
+          net_yield_now: now.net_yield, net_yield_fc: fc.net_yield,
+          price_fc_growth: r4(fc.median_price / now.median_price - 1),
+        };
+      });
+    },
+  });
+
+  dash.calc('area_snapshot', {
+    title: 'Area snapshot by house size',
+    description: 'Per council, region and England: latest-quarter rent and price for each bedroom count and property type, their 12-month and 3-year change, gross and net yield by property type (operating costs 25% of rent, 30% in London), standard new-build house sales and median price over the last four fully registered quarters, and houses in likely SFR bulk deals since 2019.',
+    inputs: ['area_quarterly'],
+    fn: (area_quarterly) => {
+      const SIZES = ['all', '1bed', '2bed', '3bed', '4bed_plus', 'detached', 'semi', 'terraced', 'flat'];
+      const TYPES = ['detached', 'semi', 'terraced', 'flat'], HOUSES = ['detached', 'semi', 'terraced'];
+      const r4 = (v) => v == null || !Number.isFinite(v) ? null : Math.round(v * 10000) / 10000;
+      const periods = [...new Set(area_quarterly.map((r) => r.period))].sort();
+      const comp = [...new Set(area_quarterly.filter((r) => r.sales_complete).map((r) => r.period))].sort().slice(-4);
+      const by = new Map();
+      for (const r of area_quarterly) { if (!by.has(r.area_code)) by.set(r.area_code, []); by.get(r.area_code).push(r); }
+      const out = [];
+      for (const [code, rows] of by) {
+        rows.sort((a, b) => a.period < b.period ? -1 : 1);
+        const at = (back) => rows.find((r) => r.period === periods[periods.length - 1 - back]);
+        const now = at(0), y1 = at(4), y3 = at(12), f = rows[0];
+        const lastWith = (field) => { for (let i = rows.length - 1; i >= 0; i--) if (rows[i][field] != null) return rows[i]; return null; };
+        const o = { area_code: code, area_name: f.area_name, area_type: f.area_type, region: f.region, quarter: now ? now.quarter : null, nb_to_quarter: rows.find((r) => r.period === comp[comp.length - 1])?.quarter ?? null };
+        const opex = f.region === 'London' ? 0.3 : 0.25;
+        for (const s of SIZES) {
+          for (const base of ['rent', 'price']) {
+            const k = base + '_' + s; if (!(k in f)) continue;
+            const cur = lastWith(k);
+            o[k + '_now'] = cur ? cur[k] : null;
+            o[k + '_12m'] = cur && y1 && y1[k] ? r4(cur[k] / y1[k] - 1) : null;
+            o[k + '_3y'] = cur && y3 && y3[k] ? r4(cur[k] / y3[k] - 1) : null;
+          }
+        }
+        for (const t of TYPES) {
+          const g = o['rent_' + t + '_now'] && o['price_' + t + '_now'] ? o['rent_' + t + '_now'] * 12 / o['price_' + t + '_now'] : null;
+          o['gross_yield_' + t] = r4(g); o['net_yield_' + t] = r4(g == null ? null : g * (1 - opex));
+        }
+        const c4 = rows.filter((r) => comp.includes(r.period));
+        for (const t of HOUSES) {
+          const n = c4.reduce((a, r) => a + r['nb_sales_' + t], 0);
+          o['nb_sales_' + t + '_4q'] = n;
+          o['nb_median_' + t + '_4q'] = n ? Math.round(c4.reduce((a, r) => a + (r['nb_median_' + t] || 0) * r['nb_sales_' + t], 0) / n) : null;
+        }
+        o.sfr_bulk_houses_total = rows.reduce((a, r) => a + r.sfr_bulk_houses, 0);
+        out.push(o);
+      }
+      return out;
+    },
+  });
+
+  // ---------- helpers ----------
+  const colorProbe = document.createElement('span');
+  colorProbe.style.display = 'none';
+  document.getElementById('top').appendChild(colorProbe);
+  const resolve = (c) => { colorProbe.style.color = ''; colorProbe.style.color = c; return getComputedStyle(colorProbe).color; };
+  const regionColor = (r) => dash.colors[Math.max(0, REGION_ORDER.indexOf(r)) % dash.colors.length];
+  let devList = [];
+  const devColor = (d) => dash.colors[Math.max(0, devList.indexOf(d)) % dash.colors.length];
+
+  const tip = (host) => {
+    let t = host.querySelector(':scope > .sfr-tip');
+    if (!t) { t = document.createElement('div'); t.className = 'sfr-tip'; t.hidden = true; host.appendChild(t); }
+    return {
+      show(event, title, lines) {
+        t.replaceChildren();
+        const h = document.createElement('div'); h.className = 't'; h.textContent = title; t.appendChild(h);
+        for (const l of lines) {
+          const r = document.createElement('div'); r.className = 'r';
+          const a = document.createElement('span');
+          if (l.color) { const i = document.createElement('i'); i.style.background = l.color; a.appendChild(i); }
+          a.appendChild(document.createTextNode(l.name));
+          const b = document.createElement('span'); b.textContent = l.value;
+          r.append(a, b); t.appendChild(r);
+        }
+        t.hidden = false;
+        const box = host.getBoundingClientRect();
+        const x = event.clientX - box.left, y = event.clientY - box.top;
+        const w = t.offsetWidth, hh = t.offsetHeight;
+        let left = x + 14; if (left + w > box.width) left = x - w - 14; if (left < 0) left = 0;
+        let top = y - hh - 10; if (top < 0) top = y + 14;
+        t.style.left = left + 'px'; t.style.top = top + 'px';
+      },
+      hide() { t.hidden = true; },
+    };
+  };
+
+  const textWidth = (svg, s) => {
+    const t = svg.append('text').attr('font-size', null).text(s);
+    const w = t.node().getComputedTextLength(); t.remove(); return w;
+  };
+
+  const status = (ids) => {
+    const st = ids.map((id) => dash.data(id));
+    if (st.some((s) => s.status === 'error' || s.status === 'connect' || s.status === 'declined' || s.status === 'missing')) return 'error';
+    if (st.some((s) => s.status !== 'ok')) return 'loading';
+    return 'ok';
+  };
+  const failed = (el) => { el.replaceChildren(); const d = document.createElement('div'); d.className = 'sfr-failed'; d.textContent = 'Failed to load'; el.appendChild(d); el.classList.remove('dash-skeleton'); };
+  const ready = (el, ids) => {
+    const s = status(ids);
+    if (s === 'error') { failed(el); return false; }
+    if (s === 'loading') { el.replaceChildren(); el.classList.add('dash-skeleton'); return false; }
+    el.classList.remove('dash-skeleton');
+    return true;
+  };
+  const animated = new Set();
+  const anim = (el) => { if (!animated.has(el.id)) { animated.add(el.id); el.classList.add('anim'); } else el.classList.remove('anim'); };
+
+  const legend = (el, items) => {
+    el.replaceChildren(...items.map((it) => {
+      const s = document.createElement('span');
+      const i = document.createElement('i'); if (it.cls) i.className = it.cls;
+      if (it.color) i.style.background = it.color;
+      s.append(i, document.createTextNode(it.label));
+      return s;
+    }));
+  };
+
+  // ---------- line chart ----------
+  function lineChart(el, { series, yFmt, yTick, band, forecastFrom, height = 300, tipFmt, highlight }) {
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren();
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${height}`).attr('height', height);
+    const all = series.flatMap((s) => s.points);
+    if (!all.length) return;
+    const x = d3.scaleUtc(d3.extent(all, (p) => p.x), [0, 1]);
+    let ylo = d3.min(all, (p) => p.y), yhi = d3.max(all, (p) => p.y);
+    if (band) { ylo = Math.min(ylo, d3.min(band, (b) => b.lo)); yhi = Math.max(yhi, d3.max(band, (b) => b.hi)); }
+    const pad = (yhi - ylo) * 0.08 || 1;
+    const y = d3.scaleLinear([ylo - pad, yhi + pad], [height - 24, 8]).nice(5);
+    const ticks = y.ticks(5);
+    const left = Math.ceil(d3.max(ticks, (t) => textWidth(svg, (yTick || yFmt)(t)))) + 10;
+    const showEnd = W > 520 && series.length <= 8;
+    const endLabels = showEnd ? series.map((s) => ({ s, p: s.points[s.points.length - 1], text: s.label + ' ' + yFmt(s.points[s.points.length - 1].y) })) : [];
+    const right = showEnd ? Math.ceil(d3.max(endLabels, (l) => textWidth(svg, l.text)) || 0) + 12 : 8;
+    x.range([left, W - right]);
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${left},0)`)
+      .call(d3.axisLeft(y).tickValues(ticks).tickSize(-(W - right - left)).tickFormat(yTick || yFmt)).attr('font-size', null).attr('font-family', null)
+      .call((g) => g.select('.domain').remove());
+    const xt = x.ticks(Math.max(2, Math.min(8, Math.floor((W - left - right) / 80))));
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${height - 24})`)
+      .call(d3.axisBottom(x).tickValues(xt).tickFormat(d3.utcFormat('%Y')).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+    if (forecastFrom) {
+      const fx = x(forecastFrom);
+      svg.append('rect').attr('x', fx).attr('y', 8).attr('width', Math.max(0, W - right - fx)).attr('height', height - 32)
+        .style('fill', 'var(--cds-chart-grid)').style('opacity', 0.35);
+      svg.append('text').attr('x', fx + 4).attr('y', 20).text('Forecast');
+    }
+    if (band && band.length) {
+      svg.append('path').datum(band).attr('class', 'mk')
+        .attr('d', d3.area().x((b) => x(b.x)).y0((b) => y(b.lo)).y1((b) => y(b.hi)))
+        .style('fill', band.color || highlight?.color || dash.colors[0]).style('opacity', 0.15);
+    }
+    const g = svg.append('g');
+    const ordered = [...series].sort((a, b) => (a.emph ? 1 : 0) - (b.emph ? 1 : 0));
+    for (const s of ordered) {
+      const act = s.points.filter((p) => !p.fc), fc = s.points.filter((p, i, a) => p.fc || (a[i + 1] && a[i + 1].fc));
+      const line = d3.line().x((p) => x(p.x)).y((p) => y(p.y));
+      const col = s.muted ? 'var(--cds-chart-muted)' : s.color;
+      g.append('path').datum(act).attr('class', 'mk').attr('d', line).style('fill', 'none').style('stroke', col)
+        .style('stroke-width', s.emph ? 2.5 : 2).style('stroke-linecap', 'round').style('stroke-linejoin', 'round');
+      if (fc.length > 1) g.append('path').datum(fc).attr('class', 'mk').attr('d', line).style('fill', 'none').style('stroke', col)
+        .style('stroke-width', s.emph ? 2.5 : 2).style('stroke-dasharray', '4 4');
+      if (!s.muted) { const p = s.points[s.points.length - 1]; g.append('circle').attr('cx', x(p.x)).attr('cy', y(p.y)).attr('r', 3).style('fill', col); }
+    }
+    if (showEnd) {
+      const labs = endLabels.map((l) => ({ ...l, y: y(l.p.y) })).sort((a, b) => a.y - b.y);
+      for (let i = 1; i < labs.length; i++) if (labs[i].y - labs[i - 1].y < 13) labs[i].y = labs[i - 1].y + 13;
+      const over = labs.length ? labs[labs.length - 1].y - (height - 28) : 0;
+      if (over > 0) for (const l of labs) l.y -= over;
+      for (const l of labs) svg.append('text').attr('x', W - right + 6).attr('y', l.y).attr('dy', '0.32em').text(l.text)
+        .style('fill', l.s.muted ? 'var(--color-fg-muted)' : l.s.color).style('font-weight', l.s.emph ? 600 : null);
+    }
+    // hover
+    const xs = [...new Set(all.map((p) => +p.x))].sort((a, b) => a - b);
+    const rule = svg.append('line').attr('y1', 8).attr('y2', height - 24).style('stroke', 'var(--cds-chart-reference)').style('opacity', 0);
+    const dots = svg.append('g');
+    const tt = tip(el);
+    svg.append('rect').attr('x', left).attr('y', 0).attr('width', Math.max(0, W - right - left)).attr('height', height - 24).style('fill', 'transparent')
+      .on('pointermove', (event) => {
+        const [mx] = d3.pointer(event); const t = x.invert(mx);
+        const xv = xs[d3.minIndex(xs, (v) => Math.abs(v - t))];
+        rule.attr('x1', x(xv)).attr('x2', x(xv)).style('opacity', 1);
+        const hits = series.map((s) => ({ s, p: s.points.find((p) => +p.x === xv) })).filter((h) => h.p).sort((a, b) => b.p.y - a.p.y);
+        dots.selectAll('circle').data(hits).join('circle').attr('cx', (h) => x(h.p.x)).attr('cy', (h) => y(h.p.y)).attr('r', 3.5)
+          .style('fill', (h) => h.s.muted ? 'var(--cds-chart-muted)' : h.s.color);
+        const p0 = hits[0]?.p;
+        tt.show(event, (p0 ? p0.label : '') + (p0 && p0.fc ? ' · forecast' : ''), hits.map((h) => ({ color: h.s.muted ? 'var(--cds-chart-muted)' : h.s.color, name: h.s.label, value: (tipFmt || yFmt)(h.p.y) })));
+      })
+      .on('pointerleave', () => { rule.style('opacity', 0); dots.selectAll('circle').remove(); tt.hide(); });
+  }
+
+  // ---------- page state ----------
+  const P = () => ({ region: dash.params().region || 'All', developer: dash.params().developer || 'All' });
+  const inScope = (r, p = P()) => (p.region === 'All' || r.region === p.region) && (p.developer === 'All' || r.developer === p.developer);
+  const inRegion = (r, p = P()) => p.region === 'All' || r.region === p.region;
+  const scopeText = (p = P()) => (p.region === 'All' ? 'All regions' : p.region) + ', ' + (p.developer === 'All' ? 'all developers' : p.developer);
+  let page = 'overview';
+  let mapMetric = 'net_yield', mapDeals = 'sfr', dealType = 'sfr';
+  const sorts = { 'dev-table': { key: 'developer', dir: 1 }, 'deal-table': { key: 'date', dir: -1 } };
+
+  // ---------- filters ----------
+  const fRegion = $('#f-region'), fDev = $('#f-dev');
+  fRegion.addEventListener('change', () => dash.setParams({ region: fRegion.value }));
+  fDev.addEventListener('change', () => dash.setParams({ developer: fDev.value }));
+  $('#f-reset').addEventListener('click', () => dash.resetParams());
+  $('#map-metric').addEventListener('change', (e) => { mapMetric = e.target.value; draw(); });
+  $('#map-deals').addEventListener('change', (e) => { mapDeals = e.target.value; draw(); });
+  $('#deal-type').addEventListener('change', (e) => { dealType = e.target.value; draw(); });
+
+  function drawFilters() {
+    const rq = dash.data('region_quarterly'), dm = dash.data('developer_metrics'), sc = dash.data('schemes');
+    const regions = rq.status === 'ok' ? REGION_ORDER.filter((r) => rq.data.some((x) => x.region === r)) : [];
+    const devs = new Set([...(dm.status === 'ok' ? dm.data : []), ...(sc.status === 'ok' ? sc.data : []), ...(uploaded ? uploaded.rows : [])].map((r) => r.developer).filter((d) => d && d !== 'Market'));
+    if (devs.size) devList = [...devs];
+    fRegion.replaceChildren(new Option('All regions', 'All'), ...regions.map((r) => new Option(r, r)));
+    fDev.replaceChildren(new Option('All developers', 'All'), ...[...devList].sort().map((d) => new Option(d, d)));
+    fRegion.value = P().region; fDev.value = P().developer;
+  }
+
+  // ---------- KPI marks ----------
+  function drawKpis() {
+    const p = P(), k = dash.data('kpi');
+    const where = enc({ region: p.region });
+    const row = k.status === 'ok' ? k.data.find((r) => r.region === p.region) : null;
+    const pts = (v) => (v > 0 ? '+' : '') + (v * 100).toFixed(2) + ' pts';
+    document.querySelectorAll('[data-k="kpi"]').forEach((el) => {
+      el.setAttribute('data-where', where);
+      if (k.status === 'loading') { el.classList.add('dash-skeleton'); return; }
+      el.classList.remove('dash-skeleton');
+      const f = el.dataset.field, v = row ? row[f] : null;
+      el.classList.remove('sfr-up', 'sfr-down');
+      const f2 = { latest_quarter: String, deals_to_quarter: String, price: fmt.gbpk, price_12m: fmt.spct, rent_pcm: fmt.gbp, rent_12m: fmt.spct, net_yield: fmt.pct2, net_yield_change: pts,
+        bulk_houses: fmt.int, bulk_houses_change: fmt.spct, bulk_price: fmt.gbpk, bulk_discount: fmt.pct, completions: fmt.int, completions_change: fmt.spct }[f];
+      el.textContent = v == null ? '—' : f2(v);
+      if (el.dataset.dir && v != null) el.classList.add(v >= 0 ? 'sfr-up' : 'sfr-down');
+    });
+    document.querySelectorAll('.t-scope').forEach((el) => { el.textContent = scopeText(p); });
+    document.querySelectorAll('.t-region').forEach((el) => { el.textContent = p.region === 'All' ? 'All regions' : p.region; });
+  }
+
+  // ---------- map ----------
+  function drawMap() {
+    const el = $('#map');
+    if (!ready(el, ['region_quarterly', 'region_growth', 'bulk_deals'])) { $('#map-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    const H = Math.min(Math.max(W * 1.05, 380), 560);
+    el.style.minHeight = H + 'px';
+    el.replaceChildren(); anim(el);
+    const rq = dash.data('region_quarterly').data, gr = dash.data('region_growth').data, deals = dash.data('bulk_deals').data;
+    const latest = {};
+    for (const r of rq) if (r.basis === 'Actual' && (!latest[r.region] || r.period > latest[r.region].period)) latest[r.region] = r;
+    const val = (region) => mapMetric === 'rent_12m' ? gr.find((g) => g.region === region)?.rent_12m : latest[region]?.[mapMetric];
+    const f = { net_yield: fmt.pct2, median_price: fmt.gbpk, rent_pcm: fmt.gbp, rent_12m: fmt.spct }[mapMetric];
+    const name = { net_yield: 'Net yield', median_price: 'Semi price', rent_pcm: 'Rent pcm', rent_12m: 'Rent growth 12m' }[mapMetric];
+    const vals = REGION_ORDER.map(val).filter((v) => v != null);
+    const lo = resolve('var(--color-panel)'), hi = resolve(dash.colors[0]);
+    const ramp = d3.scaleLinear(d3.extent(vals), [0.15, 1]);
+    const col = (v) => v == null ? 'transparent' : d3.interpolateRgb(lo, hi)(ramp(v));
+    const geo = window.SFR_GEO;
+    // Coordinates are pre-projected (x = lon * cos 53°, y = lat), so a planar fit is enough.
+    const coords = geo.features.flatMap((f) => f.geometry.coordinates.flat(2));
+    const [x0, x1] = d3.extent(coords, (c) => c[0]), [y0, y1] = d3.extent(coords, (c) => c[1]);
+    const sc = Math.min((W - 8) / (x1 - x0), (H - 8) / (y1 - y0));
+    const ox = (W - (x1 - x0) * sc) / 2, oy = (H - (y1 - y0) * sc) / 2;
+    const proj = ([x, y]) => [ox + (x - x0) * sc, oy + (y1 - y) * sc];
+    const path = (f) => f.geometry.coordinates.map((poly) => poly.map((ring) => 'M' + ring.map((c) => proj(c).map((v) => v.toFixed(1)).join(',')).join('L') + 'Z').join('')).join('');
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const p = P(); const tt = tip(el);
+    svg.append('g').selectAll('path').data(geo.features).join('path').attr('class', 'mk').attr('d', path)
+      .style('fill', (d) => col(val(d.properties.name)))
+      .style('stroke', (d) => d.properties.name === p.region ? 'var(--color-fg)' : 'var(--color-border-line)')
+      .style('stroke-width', (d) => d.properties.name === p.region ? 2 : 1)
+      .style('cursor', (d) => latest[d.properties.name] ? 'pointer' : 'default')
+      .on('pointermove', (event, d) => {
+        const r = d.properties.name, v = val(r);
+        const n = deals.filter((s) => s.region === r && s.deal_type === 'Likely SFR/PRS');
+        if (v == null) { tt.show(event, r, [{ name: 'Not covered by this dashboard', value: '' }, { name: 'SFR bulk deals since 2019', value: fmt.int(n.length) }]); return; }
+        tt.show(event, r + ' · ' + latest[r].quarter, [{ name, value: f(v) }, { name: 'SFR bulk deals since 2019', value: fmt.int(n.length) }, { name: 'Houses in them', value: fmt.int(d3.sum(n, (s) => s.houses)) }]);
+      })
+      .on('pointerleave', () => tt.hide())
+      .on('click', (event, d) => { if (latest[d.properties.name]) dash.setParams({ region: p.region === d.properties.name ? 'All' : d.properties.name }); });
+    const SFR = 'Likely SFR/PRS';
+    const pts = mapDeals === 'none' ? [] : deals.filter((s) => s.lat != null && (mapDeals === 'all' || s.deal_type === SFR));
+    const rs = d3.scaleSqrt([0, d3.max(deals, (s) => s.houses)], [0, Math.max(7, W / 50)]);
+    svg.append('g').selectAll('circle').data(pts.sort((a, b) => b.houses - a.houses)).join('circle').attr('class', 'mk')
+      .attr('cx', (s) => proj([s.lon * K, s.lat])[0]).attr('cy', (s) => proj([s.lon * K, s.lat])[1]).attr('r', (s) => Math.max(2, rs(s.houses)))
+      .style('fill', (s) => s.deal_type === SFR ? 'var(--color-fg)' : 'var(--color-panel)').style('fill-opacity', (s) => p.region === 'All' || s.region === p.region ? 0.8 : 0.2)
+      .style('stroke', 'var(--color-fg)').style('stroke-width', 1).style('stroke-opacity', 0.6)
+      .on('pointermove', (event, s) => {
+        event.stopPropagation();
+        tt.show(event, s.street + ', ' + s.town, [
+          { name: 'Registered', value: d3.utcFormat('%-d %b %Y')(new Date(s.date)) }, { name: 'Type', value: s.deal_type }, { name: 'Houses', value: fmt.int(s.houses) },
+          { name: 'Median price', value: fmt.gbpk(s.median_price) }, { name: 'Local open market', value: fmt.gbpk(s.local_om_median) }, { name: 'vs open market', value: fmt.pct(s.price_vs_local_om - 1) }]);
+      })
+      .on('pointerleave', () => tt.hide());
+    const lg = $('#map-legend');
+    legend(lg, mapDeals === 'none' ? [] : [{ label: 'Likely SFR/PRS deal', color: 'var(--color-fg)', cls: 'dot' }, ...(mapDeals === 'all' ? [{ label: 'Likely affordable/RP deal', color: 'var(--color-panel)', cls: 'dot' }] : [])]);
+    lg.querySelectorAll('i').forEach((i) => { i.style.border = '1px solid var(--color-fg)'; });
+    const ext = d3.extent(vals);
+    const g = document.createElement('span');
+    const bar = document.createElement('i'); bar.style.width = '64px'; bar.style.background = `linear-gradient(90deg, ${col(ext[0])}, ${col(ext[1])})`;
+    g.append(document.createTextNode(name + ' ' + f(ext[0])), bar, document.createTextNode(f(ext[1])));
+    lg.appendChild(g);
+  }
+
+  // ---------- horizontal bars ----------
+  function hbars(el, rows, { fmtv, selected, onClick }) {
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const rowH = 26, H = rows.length * rowH + 8;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.label))) + 10;
+    const right = Math.ceil(d3.max(rows, (r) => textWidth(svg, fmtv(r.value)))) + 10;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => r.value)], [left, W - right]);
+    const tt = tip(el);
+    const g = svg.selectAll('g').data(rows).join('g').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
+    g.append('text').attr('x', left - 8).attr('y', 11).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.label)
+      .style('fill', (r) => r.label === selected ? 'var(--color-fg)' : null);
+    g.append('rect').attr('class', 'mk').attr('x', left).attr('y', 3).attr('height', 16).attr('rx', 4).attr('width', (r) => Math.max(0, x(r.value) - left))
+      .style('fill', (r) => !selected || selected === 'All' || r.label === selected ? dash.colors[0] : 'var(--cds-chart-muted)');
+    g.append('text').attr('x', (r) => x(r.value) + 6).attr('y', 11).attr('dy', '0.32em').text((r) => fmtv(r.value));
+    g.append('rect').attr('x', 0).attr('width', W).attr('height', rowH).style('fill', 'transparent').style('cursor', 'pointer')
+      .on('click', (e, r) => onClick ? onClick(r) : dash.setParams({ region: selected === r.label ? 'All' : r.label }))
+      .on('pointermove', (e, r) => tt.show(e, r.label, r.tip || [{ name: 'Value', value: fmtv(r.value) }])).on('pointerleave', () => tt.hide());
+  }
+
+  function drawOverviewBars() {
+    const el = $('#region-bars');
+    if (ready(el, ['region_quarterly'])) {
+      const rq = dash.data('region_quarterly').data, latest = {};
+      for (const r of rq) if (r.basis === 'Actual' && (!latest[r.region] || r.period > latest[r.region].period)) latest[r.region] = r;
+      const rows = Object.values(latest).sort((a, b) => b.net_yield - a.net_yield).map((r) => ({ label: r.region, value: r.net_yield, tip: [
+        { name: 'Net yield', value: fmt.pct2(r.net_yield) }, { name: 'Gross yield', value: fmt.pct2(r.gross_yield) }, { name: 'Median price', value: fmt.gbpk(r.median_price) }, { name: 'Rent pcm', value: fmt.gbp(r.rent_pcm) }] }));
+      hbars(el, rows, { fmtv: fmt.pct2, selected: P().region });
+    }
+    const g = $('#growth-bars');
+    if (!ready(g, ['region_growth'])) return;
+    const W = g.clientWidth; if (!W) return;
+    g.replaceChildren(); anim(g);
+    const rows = [...dash.data('region_growth').data].sort((a, b) => (b.rent_12m - b.price_12m) - (a.rent_12m - a.price_12m));
+    const rowH = 34, H = rows.length * rowH + 24;
+    g.style.minHeight = H + 'px';
+    const svg = d3.select(g).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.region))) + 10;
+    const lo = Math.min(0, d3.min(rows, (r) => Math.min(r.rent_12m, r.price_12m))), hi = d3.max(rows, (r) => Math.max(r.rent_12m, r.price_12m));
+    const x = d3.scaleLinear([lo, hi], [left, W - 44]).nice();
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - 18})`).call(d3.axisBottom(x).ticks(4).tickFormat(d3.format('.0%')).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+    svg.append('line').attr('x1', x(0)).attr('x2', x(0)).attr('y1', 0).attr('y2', H - 18).style('stroke', 'var(--cds-chart-reference)');
+    const sel = P().region, tt = tip(g);
+    const row = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 2})`);
+    row.append('text').attr('x', left - 8).attr('y', 14).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.region).style('fill', (r) => r.region === sel ? 'var(--color-fg)' : null);
+    const bar = (key, yOff, c) => row.append('rect').attr('class', 'mk').attr('y', yOff).attr('height', 11).attr('rx', 3)
+      .attr('x', (r) => Math.min(x(0), x(r[key]))).attr('width', (r) => Math.abs(x(r[key]) - x(0)))
+      .style('fill', (r) => sel === 'All' || r.region === sel ? c : 'var(--cds-chart-muted)');
+    bar('rent_12m', 2, dash.colors[0]); bar('price_12m', 15, dash.colors[2]);
+    row.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.region + ' · year to ' + r.quarter_now, [{ color: dash.colors[0], name: 'Rent', value: fmt.spct(r.rent_12m) }, { color: dash.colors[2], name: 'Price', value: fmt.spct(r.price_12m) }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#growth-legend'), [{ label: 'Rent growth', color: dash.colors[0] }, { label: 'Price growth', color: dash.colors[2] }]);
+  }
+
+  // ---------- tables ----------
+  function sortRows(rows, s) {
+    return [...rows].sort((a, b) => {
+      const va = a[s.key], vb = b[s.key];
+      if (va == null) return 1; if (vb == null) return -1;
+      return (typeof va === 'number' ? va - vb : String(va).localeCompare(String(vb))) * s.dir;
+    });
+  }
+  function wireSort(id) {
+    const t = document.getElementById(id);
+    t.querySelectorAll('th button[data-sort]').forEach((b) => b.addEventListener('click', () => {
+      const s = sorts[id], k = b.dataset.sort;
+      sorts[id] = { key: k, dir: s.key === k ? -s.dir : (['developer', 'period', 'metric', 'source_type', 'street', 'town', 'region', 'deal_type'].includes(k) ? 1 : -1) };
+      draw();
+    }));
+  }
+  function ariaSort(id) {
+    const s = sorts[id];
+    document.getElementById(id).querySelectorAll('th').forEach((th) => {
+      const k = th.querySelector('button')?.dataset.sort;
+      if (k === s.key) th.setAttribute('aria-sort', s.dir > 0 ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort');
+    });
+  }
+  const td = (text, cls) => { const c = document.createElement('td'); c.textContent = text; if (cls) c.className = cls; return c; };
+
+  function drawDevTable() {
+    const body = $('#dev-table tbody'), d = dash.data('developer_metrics');
+    if (d.status !== 'ok') { body.replaceChildren(); return; }
+    const p = P();
+    const valFmt = (r) => r.unit === 'GBP' ? fmt.gbp(r.value) : r.unit === 'GBP bn' ? '£' + r.value + 'bn' : r.unit === 'share' ? fmt.pct(r.value) : r.unit === 'per outlet per week' || r.unit === 'per site per week' ? fmt.dec2(r.value) : fmt.int(r.value);
+    const rows = sortRows(d.data, sorts['dev-table']);
+    body.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr');
+      tr.dataset.key = [r.developer, r.period, r.metric].map(encodeURIComponent).join(',');
+      tr.dataset.dev = r.developer;
+      if (r.developer === p.developer) tr.className = 'sel';
+      const src = document.createElement('td');
+      const a = document.createElement('a'); a.textContent = r.source_type === 'primary' ? 'Primary' : 'Secondary';
+      if (/^https:\/\//.test(r.source_url || '')) { a.href = r.source_url; a.target = '_blank'; a.rel = 'noopener'; }
+      src.appendChild(a);
+      const note = td(r.note || '', 'hide-sm'); note.style.whiteSpace = 'normal'; note.style.minWidth = '14rem';
+      tr.append(td(r.developer), td(r.period), td(r.metric), td(valFmt(r), 'num'), note, src);
+      return tr;
+    }));
+    ariaSort('dev-table');
+  }
+  $('#dev-table').addEventListener('click', (e) => {
+    if (e.target.closest('a')) return;
+    const tr = e.target.closest('tbody tr[data-key]'); if (!tr || tr.dataset.dev === 'Market') return;
+    dash.setParams({ developer: P().developer === tr.dataset.dev ? 'All' : tr.dataset.dev });
+  });
+
+  const pill = (s) => { const c = document.createElement('td'); c.className = 'hide-sm'; const sp = document.createElement('span'); sp.className = 'sfr-pill ' + (s === 'Likely SFR/PRS' ? 'op' : 'pl'); sp.textContent = s; c.appendChild(sp); return c; };
+  function drawDealTable() {
+    const body = $('#deal-table tbody'), d = dash.data('bulk_deals');
+    if (d.status !== 'ok') { body.replaceChildren(); return; }
+    const q = $('#deal-search').value.trim().toLowerCase();
+    const typeOk = (s) => dealType === 'all' || (dealType === 'sfr') === (s.deal_type === 'Likely SFR/PRS');
+    const rows = sortRows(d.data.filter((s) => inRegion(s) && typeOk(s) && (!q || [s.street, s.town, s.district, s.outcode].join(' ').toLowerCase().includes(q))), sorts['deal-table']);
+    $('#deal-count').textContent = fmt.int(rows.length) + ' deals, ' + fmt.int(d3.sum(rows, (s) => s.houses)) + ' houses since 2019.';
+    body.replaceChildren(...rows.map((s) => {
+      const tr = document.createElement('tr'); tr.dataset.key = s.deal_id;
+      tr.append(td(s.date), td(s.street), td(s.town), td(s.region, 'hide-sm'), pill(s.deal_type), td(fmt.int(s.houses), 'num'), td(fmt.gbpk(s.median_price), 'num'),
+        td(fmt.gbpk(s.local_om_median), 'num hide-sm'), td(s.price_vs_local_om == null ? '—' : fmt.spct(s.price_vs_local_om - 1), 'num'));
+      return tr;
+    }));
+    ariaSort('deal-table');
+  }
+  $('#deal-search').addEventListener('input', () => drawDealTable());
+
+  function drawOutlook() {
+    const body = $('#outlook-table tbody'), d = dash.data('region_growth');
+    if (d.status !== 'ok') { body.replaceChildren(); return; }
+    const sel = P().region;
+    const rows = REGION_ORDER.map((r) => d.data.find((x) => x.region === r)).filter(Boolean);
+    body.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.region; if (r.region === sel) tr.className = 'sel';
+      tr.append(td(r.region), td(fmt.gbp(r.rent_now), 'num'), td(fmt.gbp(r.rent_fc), 'num'), td(fmt.spct(r.rent_fc_growth), 'num hide-sm'),
+        td(fmt.pct2(r.net_yield_now), 'num'), td(fmt.pct2(r.net_yield_fc), 'num'), td(fmt.spct(r.price_fc_growth), 'num hide-sm'));
+      return tr;
+    }));
+  }
+  $('#outlook-table').addEventListener('click', (e) => { const tr = e.target.closest('tbody tr[data-key]'); if (tr) dash.setParams({ region: P().region === tr.dataset.key ? 'All' : tr.dataset.key }); });
+
+  // ---------- region time series ----------
+  function regionSeries(field, { band } = {}) {
+    const rq = dash.data('region_quarterly').data, sel = P().region;
+    const series = REGION_ORDER.filter((r) => rq.some((x) => x.region === r)).map((r) => ({
+      label: r, color: regionColor(r), emph: r === sel, muted: sel !== 'All' && r !== sel,
+      points: rq.filter((x) => x.region === r).sort((a, b) => a.period < b.period ? -1 : 1).map((x) => ({ x: new Date(x.period), y: x[field], fc: x.basis === 'Forecast', label: x.quarter })),
+    }));
+    const fcRow = rq.filter((x) => x.basis === 'Forecast').sort((a, b) => a.period < b.period ? -1 : 1)[0];
+    let bandPts = null;
+    if (band && sel !== 'All') {
+      const rows = rq.filter((x) => x.region === sel && x.basis === 'Forecast').sort((a, b) => a.period < b.period ? -1 : 1);
+      bandPts = rows.map((x) => ({ x: new Date(x.period), lo: x[band[0]], hi: x[band[1]] }));
+      bandPts.color = regionColor(sel);
+    }
+    return { series, band: bandPts, forecastFrom: fcRow ? new Date(fcRow.period) : null };
+  }
+  function drawPriceLines() {
+    const el = $('#price-lines'); if (!ready(el, ['region_quarterly'])) return; anim(el);
+    lineChart(el, { ...regionSeries('median_price'), yFmt: fmt.gbpk, height: 320 });
+  }
+  function drawRentLines() {
+    const el = $('#rent-lines'); if (!ready(el, ['region_quarterly'])) return; anim(el);
+    lineChart(el, { ...regionSeries('rent_pcm', { band: ['rent_lo', 'rent_hi'] }), yFmt: fmt.gbp, height: 320 });
+  }
+  function drawYieldLines() {
+    const el = $('#yield-lines'); if (!ready(el, ['region_quarterly'])) return; anim(el);
+    lineChart(el, { ...regionSeries('net_yield', { band: ['net_yield_lo', 'net_yield_hi'] }), yFmt: fmt.pct2, yTick: d3.format('.1%'), height: 320 });
+  }
+
+  // ---------- developer and bulk-deal charts ----------
+  function drawRates() {
+    const el = $('#rate-bars'); if (!ready(el, ['developer_metrics'])) { $('#rate-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const dm = dash.data('developer_metrics').data, p = P();
+    const pick = (d, re) => dm.find((r) => r.developer === d && re.test(r.metric));
+    const rows = [...new Set(dm.map((r) => r.developer))].map((d) => ({ label: d, incl: pick(d, /incl\. bulk/i), excl: pick(d, /excl\. (bulk|PRS)/i) }))
+      .filter((r) => r.incl || r.excl)
+      .map((r) => {
+        // Barratt Redrow reports the PRS addition separately.
+        const add = pick(r.label, /PRS\/multi-unit addition/i);
+        if (!r.incl && r.excl && add) r.incl = { value: Math.round((r.excl.value + add.value) * 100) / 100, period: r.excl.period };
+        return r;
+      }).sort((a, b) => (b.incl?.value ?? b.excl.value) - (a.incl?.value ?? a.excl.value));
+    const rowH = 40, H = rows.length * rowH + 24;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.label)) || 0) + 10;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => Math.max(r.incl?.value || 0, r.excl?.value || 0)) || 1], [left, W - 40]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(4).tickSize(-(H - 24)).tickFormat(d3.format('.1f'))).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
+    const op = (r) => p.developer === 'All' || r.label === p.developer ? 1 : 0.35;
+    g.append('text').attr('x', left - 8).attr('y', 14).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.label);
+    g.append('rect').attr('class', 'mk').attr('x', left).attr('y', 2).attr('height', 12).attr('rx', 3).attr('width', (r) => r.incl ? x(r.incl.value) - left : 0).style('fill', dash.colors[0]).style('opacity', op);
+    g.append('rect').attr('class', 'mk').attr('x', left).attr('y', 16).attr('height', 12).attr('rx', 3).attr('width', (r) => r.excl ? x(r.excl.value) - left : 0).style('fill', dash.colors[2]).style('opacity', op);
+    g.append('text').attr('x', (r) => x(Math.max(r.incl?.value || 0, r.excl?.value || 0)) + 6).attr('y', 15).attr('dy', '0.32em')
+      .text((r) => r.incl && r.excl ? '+' + (r.incl.value - r.excl.value).toFixed(2) : '');
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.label + ' · ' + (r.incl || r.excl).period, [
+        { color: dash.colors[0], name: 'Incl. bulk/PRS', value: r.incl ? fmt.dec2(r.incl.value) : '—' }, { color: dash.colors[2], name: 'Excl. bulk/PRS', value: r.excl ? fmt.dec2(r.excl.value) : '—' }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#rate-legend'), [{ label: 'Including bulk/PRS sales', color: dash.colors[0] }, { label: 'Excluding bulk/PRS sales', color: dash.colors[2] }]);
+  }
+
+  function drawAsp() {
+    const el = $('#asp-bars'); if (!ready(el, ['developer_metrics'])) return;
+    const dm = dash.data('developer_metrics').data;
+    const rows = [...new Set(dm.map((r) => r.developer))].map((d) => {
+      const r = dm.find((x) => x.developer === d && /^Average selling price/i.test(x.metric));
+      return r && { label: d, value: r.value, tip: [{ name: r.metric.replace('Average selling price', 'ASP'), value: fmt.gbp(r.value) }, { name: 'Period', value: r.period }] };
+    }).filter(Boolean).sort((a, b) => b.value - a.value);
+    hbars(el, rows, { fmtv: fmt.gbpk, selected: P().developer, onClick: (r) => dash.setParams({ developer: P().developer === r.label ? 'All' : r.label }) });
+  }
+
+  function drawUnits() {
+    const el = $('#units-bars'); if (!ready(el, ['bulk_deals', 'region_quarterly'])) { $('#units-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P(), deals = dash.data('bulk_deals').data.filter((d) => inRegion(d, p));
+    const rq = dash.data('region_quarterly').data.filter((r) => r.basis === 'Actual');
+    const qStart = (d) => d.slice(0, 4) + '-' + String((Math.ceil(+d.slice(5, 7) / 3) - 1) * 3 + 1).padStart(2, '0') + '-01';
+    const qs = [...new Set(rq.map((r) => r.period))].sort();
+    const label = Object.fromEntries(rq.map((r) => [r.period, r.quarter]));
+    const done = new Set(rq.filter((r) => r.sales_complete).map((r) => r.period));
+    const keys = ['Likely SFR/PRS', 'Likely affordable/RP'], cols = [dash.colors[0], 'var(--cds-chart-muted)'];
+    const table = qs.map((q) => { const o = { period: q, 'Likely SFR/PRS': 0, 'Likely affordable/RP': 0 }; return o; });
+    const byQ = Object.fromEntries(table.map((o) => [o.period, o]));
+    for (const d of deals) { const o = byQ[qStart(d.date)]; if (o) o[d.deal_type] += d.houses; }
+    const H = 280;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const y = d3.scaleLinear([0, d3.max(table, (o) => o[keys[0]] + o[keys[1]]) || 1], [H - 24, 8]).nice(5);
+    const left = Math.ceil(d3.max(y.ticks(5), (t) => textWidth(svg, fmt.int(t)))) + 10;
+    const x = d3.scaleBand(qs, [left, W - 4]).padding(0.25);
+    const firstOpen = qs.find((q) => !done.has(q));
+    if (firstOpen) svg.append('rect').attr('x', x(firstOpen) - x.step() * x.paddingInner() / 2).attr('y', 8).attr('width', W - 4 - x(firstOpen) + x.step() * x.paddingInner() / 2).attr('height', H - 32).style('fill', 'var(--cds-chart-grid)').style('opacity', 0.45);
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${left},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - 4 - left)).tickFormat(fmt.int)).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const years = qs.filter((q) => q.slice(5, 7) === '01');
+    const step = Math.max(1, Math.ceil(years.length / Math.max(2, Math.floor((W - left) / 56))));
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - 24})`).call(d3.axisBottom(x).tickValues(years.filter((q, i) => i % step === 0)).tickFormat((q) => q.slice(0, 4)).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+    if (firstOpen) svg.append('text').attr('x', x(firstOpen) + 2).attr('y', 20).text('Still registering');
+    const stack = d3.stack().keys(keys)(table);
+    svg.append('g').selectAll('g').data(stack).join('g').style('fill', (s, i) => cols[i])
+      .selectAll('rect').data((s) => s).join('rect').attr('class', 'mk')
+      .attr('x', (v) => x(v.data.period)).attr('width', x.bandwidth()).attr('y', (v) => y(v[1])).attr('height', (v) => Math.max(0, y(v[0]) - y(v[1])));
+    const tt = tip(el);
+    svg.append('g').selectAll('rect').data(table).join('rect').attr('x', (o) => x(o.period) - x.step() * x.paddingInner() / 2).attr('width', x.step()).attr('y', 0).attr('height', H - 24).style('fill', 'transparent')
+      .on('pointermove', (e, o) => tt.show(e, label[o.period] + (done.has(o.period) ? '' : ' · still registering'), keys.map((k, i) => ({ color: cols[i], name: k, value: fmt.int(o[k]) + ' houses' }))))
+      .on('pointerleave', () => tt.hide());
+    legend($('#units-legend'), keys.map((k, i) => ({ label: k, color: cols[i] })));
+  }
+
+  function drawBulkOm() {
+    const el = $('#bulk-om'); if (!ready(el, ['bulk_deals', 'region_quarterly'])) { $('#bulk-om-legend').replaceChildren(); return; }
+    anim(el);
+    const p = P();
+    const deals = dash.data('bulk_deals').data.filter((d) => inRegion(d, p) && d.deal_type === 'Likely SFR/PRS');
+    const rq = dash.data('region_quarterly').data.filter((r) => r.basis === 'Actual' && r.sales_complete && inRegion(r, p) && r.om_newbuild_median != null);
+    const years = [...new Set(rq.map((r) => r.period.slice(0, 4)))].sort();
+    const om = years.map((y) => { const rs = rq.filter((r) => r.period.startsWith(y)); return { x: new Date(y + '-07-01'), y: d3.sum(rs, (r) => r.om_newbuild_median * r.newbuild_house_sales) / d3.sum(rs, (r) => r.newbuild_house_sales), label: y }; });
+    const bk = years.map((y) => { const ds = deals.filter((d) => d.date.startsWith(y)); return ds.length >= 3 ? { x: new Date(y + '-07-01'), y: d3.median(ds, (d) => d.median_price), label: y + ' · ' + ds.length + ' deals' } : null; }).filter(Boolean);
+    lineChart(el, { series: [{ label: 'Open market', color: dash.colors[2], points: om.map((o) => ({ ...o, label: bk.find((b) => +b.x === +o.x)?.label || o.label })) }, { label: 'Bulk', color: dash.colors[0], emph: true, points: bk }], yFmt: fmt.gbpk, height: 280 });
+    legend($('#bulk-om-legend'), [{ label: 'Likely SFR bulk deals (median)', color: dash.colors[0], cls: 'line' }, { label: 'Standard new-build house sales (median)', color: dash.colors[2], cls: 'line' }]);
+  }
+
+  // ---------- uploaded scheme data (this viewer's session only) ----------
+  const UP_COLS = [
+    ['scheme', true, ['scheme name', 'site', 'project', 'development', 'name']],
+    ['developer', true, ['housebuilder', 'builder', 'vendor', 'counterparty']],
+    ['region', true, ['area', 'location region']],
+    ['units', true, ['homes', 'no of units', 'number of units', 'unit count', 'plots']],
+    ['exit_price_unit', true, ['exit price', 'bulk price', 'purchase price', 'investor price', 'price per unit', 'acquisition price']],
+    ['land_cost_unit', false, ['land', 'land cost', 'land price']],
+    ['build_cost_unit', false, ['build', 'build cost', 'construction cost', 'construction']],
+    ['fees_finance_unit', false, ['fees', 'fees and finance', 'finance', 'professional fees']],
+    ['tdc_unit', false, ['tdc', 'total development cost', 'development cost', 'cost per unit']],
+    ['open_market_value_unit', false, ['open market value', 'omv', 'market value', 'gdv']],
+    ['rent_pcm', false, ['rent', 'monthly rent', 'rent per month', 'erv']],
+    ['opex_ratio', false, ['opex', 'operating costs', 'non recoverables', 'opex %']],
+    ['avg_sqft', false, ['sqft', 'size sqft', 'average sqft', 'nia sqft']],
+    ['status', false, ['stage']],
+  ];
+  const norm = (s) => String(s ?? '').toLowerCase().replace(/[^a-z0-9%]+/g, ' ').trim();
+  const REGION_ALIAS = { 'yorkshire and the humber': 'Yorkshire & Humber', 'yorkshire and humber': 'Yorkshire & Humber', 'yorkshire': 'Yorkshire & Humber', 'west mids': 'West Midlands', 'east mids': 'East Midlands', 'greater london': 'London', 'east of england': 'East of England', 'eastern': 'East of England', 'north east england': 'North East', 'north west england': 'North West' };
+  const regionName = (v) => { const n = norm(v); return REGION_ORDER.find((r) => norm(r) === n) || REGION_ALIAS[n] || String(v ?? '').trim(); };
+  let uploaded = null;
+
+  // Minimal .xlsx reader: zip directory + DecompressionStream + DOMParser, first worksheet only.
+  async function readXlsx(buf) {
+    const dv = new DataView(buf), u8 = new Uint8Array(buf);
+    let eocd = -1; for (let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 66000); i--) if (dv.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+    if (eocd < 0) throw new Error('This file is not a valid .xlsx workbook.');
+    const n = dv.getUint16(eocd + 10, true); let p = dv.getUint32(eocd + 16, true);
+    const entries = {};
+    for (let i = 0; i < n; i++) {
+      const method = dv.getUint16(p + 10, true), csize = dv.getUint32(p + 20, true), nl = dv.getUint16(p + 28, true), el = dv.getUint16(p + 30, true), cl = dv.getUint16(p + 32, true), off = dv.getUint32(p + 42, true);
+      const name = new TextDecoder().decode(u8.subarray(p + 46, p + 46 + nl));
+      entries[name] = { method, csize, off }; p += 46 + nl + el + cl;
+    }
+    const text = async (name) => {
+      const e = entries[name]; if (!e) return null;
+      const start = e.off + 30 + dv.getUint16(e.off + 26, true) + dv.getUint16(e.off + 28, true);
+      const raw = u8.slice(start, start + e.csize);
+      if (e.method === 0) return new TextDecoder().decode(raw);
+      const stream = new Blob([raw]).stream().pipeThrough(new DecompressionStream('deflate-raw'));
+      return await new Response(stream).text();
+    };
+    const xml = (s) => new DOMParser().parseFromString(s, 'application/xml');
+    const ss = await text('xl/sharedStrings.xml');
+    const shared = ss ? [...xml(ss).getElementsByTagName('si')].map((si) => [...si.getElementsByTagName('t')].map((t) => t.textContent).join('')) : [];
+    let sheet = 'xl/worksheets/sheet1.xml';
+    const wb = await text('xl/workbook.xml'), rels = await text('xl/_rels/workbook.xml.rels');
+    if (wb && rels) {
+      const first = xml(wb).getElementsByTagName('sheet')[0];
+      const rid = first && (first.getAttribute('r:id') || first.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships', 'id'));
+      const rel = [...xml(rels).getElementsByTagName('Relationship')].find((r) => r.getAttribute('Id') === rid);
+      if (rel) { const t = rel.getAttribute('Target').replace(/^\//, ''); sheet = t.startsWith('xl/') ? t : 'xl/' + t; }
+    }
+    const sx = await text(sheet); if (!sx) throw new Error('Could not find a worksheet in this workbook.');
+    const colIdx = (ref) => { let n = 0; for (const ch of ref.replace(/\d+/g, '')) n = n * 26 + ch.charCodeAt(0) - 64; return n - 1; };
+    return [...xml(sx).getElementsByTagName('row')].map((row) => {
+      const out = [];
+      for (const c of row.getElementsByTagName('c')) {
+        const t = c.getAttribute('t'), v = c.getElementsByTagName('v')[0]?.textContent;
+        out[colIdx(c.getAttribute('r') || 'A1')] = t === 's' ? shared[+v] : t === 'inlineStr' ? [...c.getElementsByTagName('t')].map((x) => x.textContent).join('') : t === 'str' || t === 'b' ? v : (v == null ? null : Number(v));
+      }
+      return out;
+    });
+  }
+  function readCsv(s) {
+    const rows = []; let row = [], cur = '', q = false;
+    for (let i = 0; i < s.length; i++) {
+      const ch = s[i];
+      if (q) { if (ch === '"') { if (s[i + 1] === '"') { cur += '"'; i++; } else q = false; } else cur += ch; }
+      else if (ch === '"') q = true; else if (ch === ',') { row.push(cur); cur = ''; }
+      else if (ch === '\n' || ch === '\r') { if (ch === '\r' && s[i + 1] === '\n') i++; row.push(cur); rows.push(row); row = []; cur = ''; }
+      else cur += ch;
+    }
+    if (cur || row.length) { row.push(cur); rows.push(row); }
+    return rows.filter((r) => r.some((c) => String(c).trim() !== ''));
+  }
+  const num = (v) => { if (v == null || v === '') return null; if (typeof v === 'number') return v; const n = Number(String(v).replace(/[£,\s]/g, '').replace(/%$/, '')); return Number.isFinite(n) ? (/%$/.test(String(v).trim()) ? n / 100 : n) : null; };
+
+  function toSchemes(grid) {
+    const head = grid[0].map(norm);
+    const pick = {}, total = {};
+    for (const [key, , alias] of UP_COLS) {
+      const names = [norm(key.replace(/_/g, ' ')), norm(key.replace(/_unit$/, '').replace(/_/g, ' ')), ...alias.map(norm)];
+      let i = head.findIndex((h) => names.includes(h));
+      if (i < 0) i = head.findIndex((h) => names.includes(h.replace(/\b(per unit|total|£|gbp|pu)\b/g, '').replace(/\s+/g, ' ').trim()));
+      if (i >= 0) { pick[key] = i; total[key] = /\btotal\b/.test(head[i]) || head[i] === 'gdv'; }
+    }
+    const missing = UP_COLS.filter(([k, need]) => need && !(k in pick)).map(([k]) => k);
+    if (!('tdc_unit' in pick) && !['land_cost_unit', 'build_cost_unit'].every((k) => k in pick)) missing.push('land_cost_unit + build_cost_unit, or tdc_unit');
+    if (missing.length) throw new Error('Missing columns: ' + missing.join(', ') + '. Open "Columns it reads" for the names it recognises.');
+    const rows = [], skipped = [];
+    grid.slice(1).forEach((r, i) => {
+      const g = (k) => k in pick ? r[pick[k]] : null;
+      const units = num(g('units')) || 1;
+      const money = (k) => { const v = num(g(k)); return v == null ? null : total[k] ? v / units : v; };
+      const land = money('land_cost_unit') ?? 0, build = money('build_cost_unit'), fees = money('fees_finance_unit') ?? 0, tdcIn = money('tdc_unit');
+      const exit = money('exit_price_unit');
+      const tdc = build != null ? land + build + fees : tdcIn;
+      if (!g('scheme') || !exit || !tdc) { skipped.push(i + 2); return; }
+      const region = regionName(g('region'));
+      let opex = num(g('opex_ratio')); if (opex != null && opex > 1) opex /= 100; if (opex == null) opex = region === 'London' ? 0.3 : 0.25;
+      const rent = num(g('rent_pcm'));
+      const gy = rent ? rent * 12 / exit : null;
+      rows.push({
+        scheme: String(g('scheme')).trim(), developer: String(g('developer') ?? 'Unknown').trim(), region, units, status: g('status') ?? '',
+        land_cost_unit: build != null ? land : 0, build_cost_unit: build != null ? build : tdc, fees_finance_unit: build != null ? fees : 0, tdc_unit: tdc,
+        exit_price_unit: exit, open_market_value_unit: money('open_market_value_unit') ?? exit, rent_pcm: rent, opex_ratio: opex, avg_sqft: num(g('avg_sqft')),
+        gross_yield: gy, net_yield: gy == null ? null : gy * (1 - opex), yield_on_cost: rent ? rent * 12 * (1 - opex) / tdc : null, profit_on_cost: (exit - tdc) / tdc,
+      });
+    });
+    return { rows, skipped };
+  }
+
+  async function loadFile(file) {
+    const st = $('#up-status');
+    try {
+      if (file.size > 20e6) throw new Error('This file is over 20 MB. Save just the scheme sheet and try again.');
+      st.textContent = 'Reading ' + file.name + '…';
+      const grid = /\.csv$/i.test(file.name) ? readCsv(await file.text()) : await readXlsx(await file.arrayBuffer());
+      if (grid.length < 2) throw new Error('No rows found under the header row.');
+      const { rows, skipped } = toSchemes(grid);
+      if (!rows.length) throw new Error('No usable rows. Each row needs a scheme name, an exit price and a cost.');
+      uploaded = { name: file.name, rows, skipped };
+      st.textContent = 'Loaded ' + rows.length + ' schemes from ' + file.name + (skipped.length ? '. Skipped rows ' + skipped.slice(0, 8).join(', ') + (skipped.length > 8 ? '…' : '') + ' (missing scheme, exit price or cost).' : '.');
+    } catch (err) {
+      st.textContent = err.message || 'Could not read this file.';
+    }
+    draw();
+  }
+  const drop = $('#up-drop'), fileIn = $('#up-file');
+  fileIn.addEventListener('change', () => { if (fileIn.files[0]) loadFile(fileIn.files[0]); fileIn.value = ''; });
+  ['dragenter', 'dragover'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+  ['dragleave', 'drop'].forEach((t) => drop.addEventListener(t, (e) => { e.preventDefault(); drop.classList.remove('over'); }));
+  drop.addEventListener('drop', (e) => { const f = e.dataTransfer?.files?.[0]; if (f) loadFile(f); });
+  $('#up-clear').addEventListener('click', () => { uploaded = null; $('#up-status').textContent = 'First sheet only. The first row must hold column names.'; draw(); });
+  $('#up-cols').replaceChildren(...UP_COLS.map(([k, need, alias]) => { const tr = document.createElement('tr'); tr.append(td(k), td(need ? 'Yes' : 'Optional'), td(alias.join(', '))); tr.lastChild.style.whiteSpace = 'normal'; return tr; }));
+  $('#up-copy').addEventListener('click', async () => {
+    const t = UP_COLS.map(([k]) => k).join('\t'), b = $('#up-copy');
+    try { await navigator.clipboard.writeText(t); b.textContent = 'Copied'; } catch { b.textContent = 'Copy failed: select the names in the table'; }
+    setTimeout(() => { b.textContent = 'Copy column names'; }, 2000);
+  });
+
+  const econReady = (el) => { if (uploaded) { el.classList.remove('dash-skeleton'); return true; } return ready(el, ['schemes']); };
+  const econRows = () => uploaded ? uploaded.rows : dash.data('schemes').data;
+  function drawUpload() {
+    const on = !!uploaded;
+    $('#up-clear').hidden = !on;
+    $('#econ-banner-label').textContent = on ? 'Your data' : 'Sample data';
+    $('#econ-banner-text').textContent = on ? 'Showing ' + uploaded.rows.length + ' schemes from ' + uploaded.name + ', in this browser only. Reload the page or press "Back to sample data" to return to the sample.' : 'Land and build costs per scheme are not published. These charts use illustrative schemes until you drop in your own appraisals or deal data below.';
+    const wrap = $('#up-preview-wrap'); wrap.hidden = !on;
+    if (!on) return;
+    const cols = [['scheme', String], ['developer', String], ['region', String], ['units', fmt.int], ['tdc_unit', fmt.gbpk], ['exit_price_unit', fmt.gbpk], ['rent_pcm', fmt.gbp], ['net_yield', fmt.pct2], ['yield_on_cost', fmt.pct2], ['profit_on_cost', fmt.pct]];
+    const labels = { scheme: 'Scheme', developer: 'Developer', region: 'Region', units: 'Units', tdc_unit: 'Cost / unit', exit_price_unit: 'Exit / unit', rent_pcm: 'Rent pcm', net_yield: 'Net yield', yield_on_cost: 'Yield on cost', profit_on_cost: 'Profit on cost' };
+    const hr = document.createElement('tr'); hr.append(...cols.map(([k]) => { const th = document.createElement('th'); th.textContent = labels[k]; if (k !== 'scheme' && k !== 'developer' && k !== 'region') th.className = 'num'; return th; }));
+    $('#up-preview thead').replaceChildren(hr);
+    $('#up-preview tbody').replaceChildren(...uploaded.rows.filter((r) => inScope(r)).map((r) => { const tr = document.createElement('tr'); tr.append(...cols.map(([k, f], i) => td(r[k] == null ? '—' : f(r[k]), i > 2 ? 'num' : ''))); return tr; }));
+  }
+
+  // ---------- economics ----------
+  const wmean = (rs, f) => d3.sum(rs, (r) => r[f] * r.units) / d3.sum(rs, (r) => r.units);
+  function drawCostStack() {
+    const el = $('#cost-stack'); if (!econReady(el)) { $('#cost-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P();
+    const rows = d3.groups(econRows().filter((s) => p.region === 'All' || s.region === p.region), (s) => s.developer).map(([d, rs]) => ({
+      label: d, land: wmean(rs, 'land_cost_unit'), build: wmean(rs, 'build_cost_unit'), fees: wmean(rs, 'fees_finance_unit'),
+      exit: wmean(rs, 'exit_price_unit'), om: wmean(rs, 'open_market_value_unit'), poc: wmean(rs, 'profit_on_cost'), n: rs.length, sqft: rs.every((r) => r.avg_sqft) ? wmean(rs, 'avg_sqft') : null,
+    })).sort((a, b) => b.exit - a.exit);
+    const rowH = 34, H = rows.length * rowH + 28;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.label)) || 0) + 10;
+    const x = d3.scaleLinear([0, d3.max(rows, (r) => Math.max(r.om, r.exit, r.land + r.build + r.fees)) || 1], [left, W - 12]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left) / 90))).tickSize(-(H - 24)).tickFormat(fmt.gbpk)).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const parts = [['land', 'Land', dash.colors[3]], ['build', 'Build', dash.colors[0]], ['fees', 'Fees & finance', dash.colors[4]]];
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
+    g.append('text').attr('x', left - 8).attr('y', 12).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.label).style('fill', (r) => r.label === p.developer ? 'var(--color-fg)' : null);
+    let acc = (r, k) => parts.slice(0, parts.findIndex((q) => q[0] === k)).reduce((a, q) => a + r[q[0]], 0);
+    for (const [k, , c] of parts) g.append('rect').attr('class', 'mk').attr('y', 3).attr('height', 18).attr('x', (r) => x(acc(r, k))).attr('width', (r) => Math.max(0, x(acc(r, k) + r[k]) - x(acc(r, k))))
+      .style('fill', c).style('opacity', (r) => p.developer === 'All' || r.label === p.developer ? 1 : 0.35);
+    g.append('line').attr('x1', (r) => x(r.exit)).attr('x2', (r) => x(r.exit)).attr('y1', -1).attr('y2', 25).style('stroke', 'var(--color-fg)').style('stroke-width', 2.5);
+    g.append('circle').attr('cx', (r) => x(r.om)).attr('cy', 12).attr('r', 5).style('fill', 'var(--color-panel)').style('stroke', 'var(--color-fg)').style('stroke-width', 1.5);
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.label + ' · ' + r.n + ' schemes', [
+        { color: dash.colors[3], name: 'Land', value: fmt.gbpk(r.land) }, { color: dash.colors[0], name: 'Build', value: fmt.gbpk(r.build) + (r.sqft ? ' (£' + Math.round(r.build / r.sqft) + '/sq ft)' : '') },
+        { color: dash.colors[4], name: 'Fees & finance', value: fmt.gbpk(r.fees) }, { name: 'Total cost', value: fmt.gbpk(r.land + r.build + r.fees) },
+        { name: 'Exit price', value: fmt.gbpk(r.exit) }, { name: 'Open-market value', value: fmt.gbpk(r.om) }, { name: 'Profit on cost', value: fmt.pct(r.poc) }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#cost-legend'), [...parts.map(([, l, c]) => ({ label: l, color: c })), { label: 'Exit price to investor', color: 'var(--color-fg)', cls: 'line' }, { label: 'Open-market value', color: 'var(--color-panel)', cls: 'dot' }]);
+    $('#cost-legend').lastChild.querySelector('i').style.border = '1.5px solid var(--color-fg)';
+  }
+
+  function drawScatter() {
+    const el = $('#cost-scatter'); if (!econReady(el)) { $('#scatter-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const all = econRows(), p = P(), pts = all.filter((s) => inScope(s, p));
+    const H = 300;
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const ext = d3.extent(all.flatMap((s) => [s.tdc_unit, s.exit_price_unit]));
+    const y = d3.scaleLinear([ext[0] * 0.95, ext[1] * 1.03], [H - 36, 8]).nice(5);
+    const left = Math.ceil(d3.max(y.ticks(5), (t) => textWidth(svg, fmt.gbpk(t)))) + 10;
+    const x = d3.scaleLinear(y.domain(), [left, W - 8]);
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(${left},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(W - 8 - left)).tickFormat(fmt.gbpk)).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    svg.append('g').attr('class', 'axis').attr('transform', `translate(0,${H - 36})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left) / 80))).tickFormat(fmt.gbpk).tickSizeOuter(0)).attr('font-size', null).attr('font-family', null);
+    svg.append('text').attr('x', W - 8).attr('y', H - 4).attr('text-anchor', 'end').text('Total development cost per unit');
+    svg.append('text').attr('x', left + 4).attr('y', 18).text('Exit price per unit');
+    const [d0, d1] = y.domain();
+    svg.append('line').attr('x1', x(d0)).attr('y1', y(d0)).attr('x2', x(d1)).attr('y2', y(d1)).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '4 4');
+    svg.append('line').attr('x1', x(d0)).attr('y1', y(d0 * 1.15)).attr('x2', x(d1 / 1.15)).attr('y2', y(d1)).style('stroke', 'var(--cds-chart-reference)').style('stroke-dasharray', '1 4');
+    svg.append('text').attr('x', x(d1 / 1.15) - 4).attr('y', y(d1) + 12).attr('text-anchor', 'end').text('15% margin');
+    svg.append('text').attr('x', x(d1) - 4).attr('y', y(d1) + 26).attr('text-anchor', 'end').text('Break-even');
+    const rs = d3.scaleSqrt([0, d3.max(all, (s) => s.units)], [0, 9]);
+    const tt = tip(el);
+    svg.append('g').selectAll('circle').data(pts).join('circle').attr('class', 'mk').attr('cx', (s) => x(s.tdc_unit)).attr('cy', (s) => y(s.exit_price_unit)).attr('r', (s) => Math.max(3, rs(s.units)))
+      .style('fill', (s) => regionColor(s.region)).style('fill-opacity', 0.75).style('stroke', 'var(--color-panel)')
+      .on('pointermove', (e, s) => tt.show(e, s.scheme + ' · ' + s.developer, [{ name: 'Cost / unit', value: fmt.gbpk(s.tdc_unit) }, { name: 'Exit / unit', value: fmt.gbpk(s.exit_price_unit) }, { name: 'Profit on cost', value: fmt.pct(s.profit_on_cost) }, { name: 'Units', value: fmt.int(s.units) }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#scatter-legend'), REGION_ORDER.filter((r) => pts.some((s) => s.region === r)).map((r) => ({ label: r, color: regionColor(r), cls: 'dot' })));
+  }
+
+  function drawSpread() {
+    const el = $('#spread'); if (!econReady(el)) { $('#spread-legend').replaceChildren(); return; }
+    const W = el.clientWidth; if (!W) return;
+    el.replaceChildren(); anim(el);
+    const p = P();
+    const rows = d3.groups(econRows().filter((s) => p.region === 'All' || s.region === p.region), (s) => s.developer)
+      .map(([d, rs]) => { rs = rs.filter((r) => r.yield_on_cost != null && r.net_yield != null); return rs.length ? { label: d, yoc: wmean(rs, 'yield_on_cost'), ny: wmean(rs, 'net_yield') } : null; }).filter(Boolean).sort((a, b) => (b.yoc - b.ny) - (a.yoc - a.ny));
+    const rowH = 30, H = rows.length * rowH + 28;
+    el.style.minHeight = H + 'px';
+    const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('height', H);
+    const left = Math.ceil(d3.max(rows, (r) => textWidth(svg, r.label)) || 0) + 10;
+    const spreadW = Math.ceil(textWidth(svg, '+0.00 pts')) + 10;
+    const lo = d3.min(rows, (r) => Math.min(r.yoc, r.ny)), hi = d3.max(rows, (r) => Math.max(r.yoc, r.ny));
+    const x = d3.scaleLinear([lo - 0.002, hi + 0.002], [left, W - spreadW]).nice();
+    svg.append('g').attr('class', 'grid').attr('transform', `translate(0,${H - 20})`).call(d3.axisBottom(x).ticks(Math.max(2, Math.floor((W - left - spreadW) / 70))).tickSize(-(H - 24)).tickFormat(d3.format('.1%'))).attr('font-size', null).attr('font-family', null).call((g) => g.select('.domain').remove());
+    const tt = tip(el);
+    const g = svg.selectAll('g.r').data(rows).join('g').attr('class', 'r').attr('transform', (r, i) => `translate(0,${i * rowH + 4})`);
+    const op = (r) => p.developer === 'All' || r.label === p.developer ? 1 : 0.3;
+    g.append('text').attr('x', left - 8).attr('y', 10).attr('dy', '0.32em').attr('text-anchor', 'end').text((r) => r.label);
+    g.append('line').attr('class', 'mk').attr('x1', (r) => x(r.ny)).attr('x2', (r) => x(r.yoc)).attr('y1', 10).attr('y2', 10).style('stroke', 'var(--cds-chart-muted)').style('stroke-width', 3).style('opacity', op);
+    g.append('circle').attr('class', 'mk').attr('cx', (r) => x(r.ny)).attr('cy', 10).attr('r', 5).style('fill', dash.colors[2]).style('opacity', op);
+    g.append('circle').attr('class', 'mk').attr('cx', (r) => x(r.yoc)).attr('cy', 10).attr('r', 5).style('fill', dash.colors[0]).style('opacity', op);
+    g.append('text').attr('x', W - spreadW + 6).attr('y', 10).attr('dy', '0.32em').text((r) => ((r.yoc - r.ny) >= 0 ? '+' : '') + ((r.yoc - r.ny) * 100).toFixed(2) + ' pts');
+    g.append('rect').attr('width', W).attr('height', rowH).style('fill', 'transparent')
+      .on('pointermove', (e, r) => tt.show(e, r.label, [{ color: dash.colors[0], name: 'Yield on cost', value: fmt.pct2(r.yoc) }, { color: dash.colors[2], name: 'Net yield on exit price', value: fmt.pct2(r.ny) }, { name: 'Spread', value: ((r.yoc - r.ny) * 100).toFixed(2) + ' pts' }]))
+      .on('pointerleave', () => tt.hide());
+    legend($('#spread-legend'), [{ label: 'Yield on cost', color: dash.colors[0], cls: 'dot' }, { label: 'Net yield on exit price', color: dash.colors[2], cls: 'dot' }]);
+  }
+
+  // ---------- region deep dive ----------
+  const DIMS = {
+    type: [['detached', 'Detached'], ['semi', 'Semi-detached'], ['terraced', 'Terraced'], ['flat', 'Flat']],
+    bedrooms: [['1bed', '1 bed'], ['2bed', '2 bed'], ['3bed', '3 bed'], ['4bed_plus', '4+ bed']],
+  };
+  const HOUSE = new Set(['detached', 'semi', 'terraced']), TYPE = new Set(['detached', 'semi', 'terraced', 'flat']);
+  const METRICS = {
+    rent: { label: 'Rent pcm', ok: () => true, q: (r, s) => r['rent_' + s], snap: (s) => 'rent_' + s + '_now', fmt: fmt.gbp },
+    price: { label: 'Average price', ok: (s) => TYPE.has(s) || s === 'all', q: (r, s) => r['price_' + s], snap: (s) => 'price_' + s + '_now', fmt: fmt.gbpk },
+    gross_yield: { label: 'Gross yield', ok: (s) => TYPE.has(s), q: (r, s) => r['rent_' + s] && r['price_' + s] ? r['rent_' + s] * 12 / r['price_' + s] : null, snap: (s) => 'gross_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
+    net_yield: { label: 'Net yield', ok: (s) => TYPE.has(s), q: (r, s) => r['rent_' + s] && r['price_' + s] ? r['rent_' + s] * 12 / r['price_' + s] * (r.region === 'London' ? 0.7 : 0.75) : null, snap: (s) => 'net_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
+    rent_12m: { label: 'Rent growth, 12 months', ok: () => true, q: null, snap: (s) => 'rent_' + s + '_12m', fmt: fmt.spct, tick: d3.format('.0%') },
+    nb_median: { label: 'New-build house median price', ok: (s) => HOUSE.has(s), q: (r, s) => r.sales_complete ? r['nb_median_' + s] : null, snap: (s) => 'nb_median_' + s + '_4q', fmt: fmt.gbpk },
+    nb_sales: { label: 'New-build house sales', ok: (s) => HOUSE.has(s), q: (r, s) => r.sales_complete ? r['nb_sales_' + s] : null, snap: (s) => 'nb_sales_' + s + '_4q', fmt: fmt.int },
+  };
+  let ddDim = 'type', ddMetric = 'rent', ddSize = 'semi', ddArea = null;
+  const ddSorts = { key: 'rent_now', dir: -1 };
+  const ddRegionSel = $('#dd-regions'), ddAreaSel = $('#dd-area'), ddDimSel = $('#dd-dim'), ddMetricSel = $('#dd-metric'), ddSizeSel = $('#dd-size');
+  ddDimSel.addEventListener('change', () => { ddDim = ddDimSel.value; if (!DIMS[ddDim].some(([s]) => s === ddSize)) ddSize = ddDim === 'type' ? 'semi' : '3bed'; if (!metricOk(ddMetric)) ddMetric = 'rent'; draw(); });
+  ddMetricSel.addEventListener('change', () => { ddMetric = ddMetricSel.value; draw(); });
+  ddSizeSel.addEventListener('change', () => { ddSize = ddSizeSel.value; draw(); });
+  ddAreaSel.addEventListener('change', () => { ddArea = ddAreaSel.value; draw(); });
+  $('#dd-search').addEventListener('input', () => drawDdTable());
+  const metricOk = (m) => DIMS[ddDim].some(([s]) => METRICS[m].ok(s));
+  const sizeLabel = (s) => s === 'all' ? 'All homes' : [...DIMS.type, ...DIMS.bedrooms].find(([k]) => k === s)[1];
+
+  function ddContext() {
+    const snap = dash.data('area_snapshot');
+    if (snap.status !== 'ok') return null;
+    const region = P().region;
+    const rows = snap.data;
+    const parent = region === 'All' ? rows.find((r) => r.area_type === 'Country') : rows.find((r) => r.area_type === 'Region' && r.region === region);
+    const children = region === 'All' ? REGION_ORDER.map((n) => rows.find((r) => r.area_type === 'Region' && r.region === n)).filter(Boolean)
+      : rows.filter((r) => r.area_type === 'Council' && r.region === region).sort((a, b) => a.area_name.localeCompare(b.area_name));
+    if (!ddArea || ![parent, ...children].some((r) => r && r.area_code === ddArea)) ddArea = parent ? parent.area_code : null;
+    const area = rows.find((r) => r.area_code === ddArea);
+    return { rows, parent, children, area, region };
+  }
+
+  function drawDdControls(ctx) {
+    const region = P().region;
+    ddRegionSel.replaceChildren(...[['All', 'England'], ...REGION_ORDER.map((r) => [r, r])].map(([v, l]) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'sfr-chip'; b.textContent = l;
+      b.setAttribute('aria-selected', String(region === v)); b.setAttribute('role', 'tab');
+      b.addEventListener('click', () => { ddArea = null; dash.setParams({ region: v }); });
+      return b;
+    }));
+    if (ctx) {
+      ddAreaSel.replaceChildren(...[ctx.parent, ...ctx.children].filter(Boolean).map((r, i) => new Option((i === 0 ? '' : '  ') + r.area_name + (i === 0 ? (region === 'All' ? ' (all regions)' : ' (whole region)') : ''), r.area_code)));
+      ddAreaSel.value = ddArea || '';
+    }
+    ddDimSel.value = ddDim;
+    ddMetricSel.replaceChildren(...Object.entries(METRICS).filter(([k]) => metricOk(k)).map(([k, m]) => new Option(m.label, k)));
+    ddMetricSel.value = ddMetric;
+    ddSizeSel.replaceChildren(new Option('All homes', 'all'), ...DIMS[ddDim].map(([k, l]) => new Option(l, k)));
+    ddSizeSel.value = ddSize;
+  }
+
+  function drawDdSizes(ctx) {
+    const body = $('#dd-size-table tbody');
+    if (!ctx || !ctx.area) { body.replaceChildren(); return; }
+    const a = ctx.area, where = enc({ area_code: a.area_code });
+    $('#dd-sizes-title').textContent = a.area_name + ' by ' + (ddDim === 'type' ? 'property type' : 'bedrooms') + ' · ' + a.quarter;
+    $('#dd-nb-q').textContent = a.nb_to_quarter || '—';
+    const cell = (field, f, cls) => {
+      const c = document.createElement('td'); c.className = 'num' + (cls ? ' ' + cls : '');
+      if (field && field in a) { c.setAttribute('data-source', 'area_snapshot'); c.setAttribute('data-field', field); c.setAttribute('data-where', where); c.textContent = a[field] == null ? '—' : f(a[field]); }
+      else c.textContent = '—';
+      return c;
+    };
+    body.replaceChildren(...[...DIMS[ddDim], ['all', 'All homes']].map(([s, l]) => {
+      const tr = document.createElement('tr'); if (s === ddSize) tr.className = 'sel';
+      tr.dataset.size = s; tr.style.cursor = 'pointer';
+      const h = HOUSE.has(s);
+      tr.append(td(l), cell('rent_' + s + '_now', fmt.gbp), cell('rent_' + s + '_12m', fmt.spct), cell('rent_' + s + '_3y', fmt.spct, 'hide-sm'),
+        cell(TYPE.has(s) || s === 'all' ? 'price_' + s + '_now' : null, fmt.gbpk), cell(TYPE.has(s) || s === 'all' ? 'price_' + s + '_12m' : null, fmt.spct),
+        cell(TYPE.has(s) ? 'gross_yield_' + s : null, fmt.pct2), cell(TYPE.has(s) ? 'net_yield_' + s : null, fmt.pct2, 'hide-sm'),
+        cell(h ? 'nb_median_' + s + '_4q' : null, fmt.gbpk, 'hide-sm'), cell(h ? 'nb_sales_' + s + '_4q' : null, fmt.int, 'hide-sm'));
+      return tr;
+    }));
+  }
+  $('#dd-size-table').addEventListener('click', (e) => { const tr = e.target.closest('tbody tr[data-size]'); if (tr) { ddSize = tr.dataset.size; draw(); } });
+
+  function drawDdTrend(ctx) {
+    const el = $('#dd-trend');
+    if (!ready(el, ['area_quarterly', 'area_snapshot']) || !ctx || !ctx.area) { $('#dd-trend-legend').replaceChildren(); return; }
+    anim(el);
+    const m = METRICS[ddMetric];
+    const rows = dash.data('area_quarterly').data.filter((r) => r.area_code === ddArea).sort((a, b) => a.period < b.period ? -1 : 1);
+    const sizes = DIMS[ddDim].filter(([s]) => m.ok(s));
+    const q = m.q || ((r, s) => null);
+    let series = sizes.map(([s, l], i) => ({ label: l, color: dash.colors[i], emph: s === ddSize, points: rows.map((r) => ({ x: new Date(r.period), y: q(r, s), label: r.quarter })).filter((p) => p.y != null) }));
+    if (ddMetric === 'rent_12m') series = sizes.map(([s, l], i) => ({ label: l, color: dash.colors[i], emph: s === ddSize,
+      points: rows.map((r, j) => j >= 4 && r['rent_' + s] && rows[j - 4]['rent_' + s] ? { x: new Date(r.period), y: r['rent_' + s] / rows[j - 4]['rent_' + s] - 1, label: r.quarter } : null).filter(Boolean) }));
+    series = series.filter((s) => s.points.length > 1);
+    $('#dd-trend-title').textContent = m.label + ' in ' + ctx.area.area_name;
+    $('#dd-trend-note').textContent = ddMetric.startsWith('nb_') ? 'Standard sales of new-build houses per quarter, fully registered quarters only.' : 'Quarterly averages since 2019.' + (ddMetric.includes('yield') ? ' Net yield takes off operating costs of 25% of rent (30% in London).' : '');
+    if (!series.length) { el.replaceChildren(); const d = document.createElement('div'); d.className = 'sfr-failed'; d.textContent = 'No data for this area and metric'; el.appendChild(d); $('#dd-trend-legend').replaceChildren(); return; }
+    lineChart(el, { series, yFmt: m.fmt, yTick: m.tick, height: 300 });
+    legend($('#dd-trend-legend'), series.map((s) => ({ label: s.label, color: s.color, cls: 'line' })));
+  }
+
+  function ddField(col, s) {
+    return {
+      rent_now: 'rent_' + s + '_now', rent_12m: 'rent_' + s + '_12m', rent_3y: 'rent_' + s + '_3y',
+      price_now: TYPE.has(s) || s === 'all' ? 'price_' + s + '_now' : null, price_12m: TYPE.has(s) || s === 'all' ? 'price_' + s + '_12m' : null,
+      gross_yield: TYPE.has(s) ? 'gross_yield_' + s : null, nb_median: HOUSE.has(s) ? 'nb_median_' + s + '_4q' : null, nb_sales: HOUSE.has(s) ? 'nb_sales_' + s + '_4q' : null,
+      sfr_bulk_houses_total: 'sfr_bulk_houses_total', area_name: 'area_name',
+    }[col];
+  }
+
+  function drawDdRank(ctx) {
+    const el = $('#dd-rank');
+    if (!ready(el, ['area_snapshot']) || !ctx) return;
+    const m = METRICS[ddMetric], s = ddSize;
+    const unit = ctx.region === 'All' ? 'Regions' : 'Councils in ' + ctx.region;
+    $('#dd-rank-title').textContent = unit + ' by ' + m.label.toLowerCase() + ' · ' + sizeLabel(s);
+    if (!m.ok(s) && !(s === 'all' && (ddMetric === 'rent' || ddMetric === 'price' || ddMetric === 'rent_12m'))) {
+      el.replaceChildren(); el.style.minHeight = '';
+      const d = document.createElement('div'); d.className = 'sfr-failed'; d.textContent = m.label + ' is not published for ' + sizeLabel(s).toLowerCase() + ' homes'; el.appendChild(d); return;
+    }
+    const f = m.snap(s);
+    let rows = ctx.children.filter((r) => r[f] != null).map((r) => ({ label: r.area_name, value: r[f], code: r.area_code })).sort((a, b) => b.value - a.value);
+    const n = rows.length; const top = rows.slice(0, 20);
+    if (ddArea && !top.some((r) => r.code === ddArea)) { const sel = rows.find((r) => r.code === ddArea); if (sel) top.push(sel); }
+    $('#dd-rank-note').textContent = (n > 20 ? 'Top 20 of ' + n + '. ' : '') + 'Click a bar to open that area.';
+    if (!top.length) { el.replaceChildren(); return; }
+    const min = d3.min(top, (r) => r.value);
+    if (min < 0) top.forEach((r) => { r.tip = [{ name: m.label, value: m.fmt(r.value) }]; });
+    const sel = ctx.children.find((r) => r.area_code === ddArea)?.area_name;
+    hbars(el, top.map((r) => ({ ...r, value: Math.max(0, r.value), raw: r.value, tip: [{ name: m.label, value: m.fmt(r.value) }] })), {
+      fmtv: (v) => m.fmt(v), selected: sel || 'All', onClick: (r) => { ddArea = r.code; draw(); },
+    });
+    if (min < 0) d3.select(el).selectAll('g > text').filter(function () { return this.getAttribute('text-anchor') !== 'end'; }).text((r) => m.fmt(r.raw));
+  }
+
+  function drawDdTable(ctx = ddContext()) {
+    const t = $('#dd-table'), body = t.querySelector('tbody');
+    if (!ctx) { body.replaceChildren(); return; }
+    const s = ddSize;
+    $('#dd-table-title').textContent = (ctx.region === 'All' ? 'Regions' : 'Councils in ' + ctx.region) + ' · ' + sizeLabel(s);
+    t.querySelectorAll('th[data-col]').forEach((th) => { const f = ddField(th.dataset.col, s); if (f) th.setAttribute('data-field', f); else th.removeAttribute('data-field'); });
+    const q = $('#dd-search').value.trim().toLowerCase();
+    const sortField = ddField(ddSorts.key, s) || 'area_name';
+    const rows = sortRows(ctx.children.filter((r) => !q || r.area_name.toLowerCase().includes(q)), { key: sortField, dir: ddSorts.dir });
+    const cols = [['rent_now', fmt.gbp], ['rent_12m', fmt.spct], ['rent_3y', fmt.spct, 'hide-sm'], ['price_now', fmt.gbpk], ['price_12m', fmt.spct, 'hide-sm'], ['gross_yield', fmt.pct2], ['nb_median', fmt.gbpk, 'hide-sm'], ['nb_sales', fmt.int, 'hide-sm'], ['sfr_bulk_houses_total', fmt.int]];
+    body.replaceChildren(...rows.map((r) => {
+      const tr = document.createElement('tr'); tr.dataset.key = r.area_code; if (r.area_code === ddArea) tr.className = 'sel';
+      tr.append(td(r.area_name), ...cols.map(([c, f, cls]) => { const k = ddField(c, s); return td(k && r[k] != null ? f(r[k]) : '—', 'num' + (cls ? ' ' + cls : '')); }));
+      return tr;
+    }));
+    t.querySelectorAll('th').forEach((th) => { const k = th.querySelector('button')?.dataset.sort; if (k === ddSorts.key) th.setAttribute('aria-sort', ddSorts.dir > 0 ? 'ascending' : 'descending'); else th.removeAttribute('aria-sort'); });
+  }
+  $('#dd-table').addEventListener('click', (e) => {
+    const b = e.target.closest('th button[data-sort]');
+    if (b) { const k = b.dataset.sort; ddSorts.dir = ddSorts.key === k ? -ddSorts.dir : (k === 'area_name' ? 1 : -1); ddSorts.key = k; drawDdTable(); return; }
+    const tr = e.target.closest('tbody tr[data-key]'); if (tr) { ddArea = tr.dataset.key; draw(); }
+  });
+
+  function drawDeepDive() {
+    const ctx = ddContext();
+    drawDdControls(ctx); drawDdSizes(ctx); drawDdTrend(ctx); drawDdRank(ctx); drawDdTable(ctx);
+  }
+
+  // ---------- tabs ----------
+  const pages = { overview: [drawMap, drawOverviewBars], pricing: [drawRates, drawAsp, drawDevTable, drawUnits, drawBulkOm, drawPriceLines], regions: [drawDeepDive], yields: [drawRentLines, drawYieldLines, drawOutlook], deals: [drawDealTable], economics: [drawUpload, drawCostStack, drawScatter, drawSpread] };
+  function show(id) {
+    if (!pages[id]) return;
+    page = id;
+    document.querySelectorAll('.sfr-page').forEach((s) => { s.hidden = s.dataset.page !== id; });
+    document.querySelectorAll('.sfr-tab').forEach((t) => t.setAttribute('aria-selected', String(t.dataset.page === id)));
+    dash.setLink(id);
+    draw();
+  }
+  document.querySelectorAll('.sfr-tab').forEach((t) => t.addEventListener('click', () => show(t.dataset.page)));
+  wireSort('dev-table'); wireSort('deal-table');
+
+  function draw() {
+    drawFilters(); drawKpis();
+    for (const f of pages[page]) f();
+  }
+  dash.onData(draw);
+  const start = location.hash.slice(1);
+  if (pages[start]) show(start);
+})();
+</script>
