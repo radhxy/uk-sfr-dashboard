@@ -4,7 +4,7 @@ Static site served by GitHub Pages from `main` at the repo root (https://radhxy.
 
 ## Layout
 - `dashboard.html` is the source page: one `<style>`, the markup, and one `<script>`. Edit this, not `index.html`.
-- `build.py` wraps it into `index.html` (theme tokens, fonts, Sources footer, script tags). Run `python3 -I build.py` after any change to `dashboard.html` or the dataset list in `build.py`, and commit both.
+- `build.py` wraps it into `index.html` (theme tokens, fonts, script tags) and owns the sources: `SOURCES` lists each original publication with its link and licence, `CARD_SOURCES` says which sources each chart or table cites (rendered as a "Source:" line under it), company documents are listed from the `source_url` fields, and it writes CSV copies of every dataset to `data/csv/` for the download links. Add a source there when you add data. Run `python3 -I build.py` after any change to `dashboard.html` or the dataset list in `build.py`, and commit both.
 - `js/dash-shim.js` stands in for the claude.ai dashboard runtime: `dash.data(id)` loads `data/<file>.json` (mapped in `build.py`), `dash.calc` runs calculations, `dash.setParams` holds the region/developer filters.
 - `data/` holds the datasets as JSON arrays of row objects. Keep column names stable; the page reads them by name.
 
