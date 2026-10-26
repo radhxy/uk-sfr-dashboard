@@ -24,6 +24,20 @@
 .sfr-page { display: grid; gap: var(--cds-gap-md); }
 .sfr-page[hidden] { display: none; }
 .sfr-grid[hidden] { display: none; }
+.sfr-ybasis { display: grid; gap: var(--cds-gap-sm); padding: var(--cds-pad-md) var(--cds-pad-lg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); background: var(--color-panel); }
+.sfr-ybasis-head { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); align-items: center; }
+.sfr-ybasis-head .sfr-note { flex: 1 1 22rem; min-width: 0; margin: 0; }
+.sfr-seg { display: inline-flex; border: 1px solid var(--color-border-line); border-radius: 999px; padding: 2px; }
+.sfr-seg button { font: inherit; font-size: var(--cds-font-size-body); border: 0; background: none; color: var(--color-fg-muted); padding: var(--cds-pad-xs) var(--cds-pad-md); border-radius: 999px; cursor: pointer; }
+.sfr-seg button[aria-checked="true"] { background: var(--color-fg); color: var(--color-bg); }
+.sfr-seg button:focus-visible { outline: 2px solid var(--color-fg); outline-offset: 2px; }
+.sfr-ybasis-fields { display: flex; flex-wrap: wrap; gap: var(--cds-gap-sm) var(--cds-gap-md); align-items: end; }
+.sfr-ybasis-fields label { display: grid; gap: 2px; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.sfr-in { display: inline-flex; align-items: center; gap: 4px; }
+.sfr-in i { font-style: normal; }
+.sfr-ybasis-fields input, .sfr-ybasis-fields select { font: inherit; font-size: var(--cds-font-size-body); color: var(--color-fg); background: var(--color-bg); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-xs) var(--cds-pad-sm); }
+.sfr-ybasis-fields input { width: 5.5em; font-variant-numeric: tabular-nums; }
+.sfr-ybasis-fields input:disabled { opacity: .45; }
 .sfr-grid.two { grid-template-columns: repeat(auto-fit, minmax(min(100%, 34rem), 1fr)); }
 .sfr th:not(:has(button)) { padding: var(--cds-pad-xs) var(--cds-pad-sm); }
 .sfr-lede { max-width: 80ch; }
@@ -97,23 +111,44 @@
     <p class="sfr-take" id="takeaway">
       <span class="t-region">All regions</span>, <b class="dash-skeleton" data-source="kpi" data-field="latest_quarter" data-k="kpi">—</b>:
       semi-detached houses rent for <b class="dash-skeleton" data-source="kpi" data-field="rent_pcm" data-k="kpi">—</b> a month against an average price of
-      <b class="dash-skeleton" data-source="kpi" data-field="price" data-k="kpi">—</b>, a net yield of
-      <b class="dash-skeleton" data-source="kpi" data-field="net_yield" data-k="kpi">—</b>.
+      <b class="dash-skeleton" data-source="kpi" data-field="price" data-k="kpi">—</b>. For <span class="t-ymix">terraced + semi</span> houses the
+      <span class="t-yname-lc">net initial yield</span> is <b class="dash-skeleton" data-y="now">—</b>.
       In the four complete quarters to <b class="dash-skeleton" data-source="kpi" data-field="deals_to_quarter" data-k="kpi">—</b>,
       <b class="dash-skeleton" data-source="kpi" data-field="bulk_houses" data-k="kpi">—</b> new-build houses were bought in likely SFR bulk deals at a median
       <b class="dash-skeleton" data-source="kpi" data-field="bulk_price" data-k="kpi">—</b>,
       <b class="dash-skeleton" data-source="kpi" data-field="bulk_discount" data-k="kpi">—</b> below local open-market new-build prices.
     </p>
-    <div class="sfr-banner" role="note"><strong>Public data</strong><span>Prices, rents, bulk deals and housebuilding come from ONS, HM Land Registry and MHCLG; developer figures from company results. Net yields assume operating costs of 25% of rent (30% in London). Price forecasts blend Knight Frank and Savills national forecasts; rent forecasts are a trend assumption. Development economics uses each housebuilder's reported margins and land costs.</span></div>
+    <div class="sfr-banner" role="note"><strong>Public data</strong><span>Prices, rents, bulk deals and housebuilding come from ONS, HM Land Registry and MHCLG; developer figures from company results. Yields follow the assumptions in the Yield basis panel below, saved in your browser. Price forecasts blend Knight Frank and Savills national forecasts; rent forecasts are a trend assumption. Development economics uses each housebuilder's reported margins and land costs.</span></div>
     <div class="sfr-filters">
       <label for="f-region">Region<select id="f-region" data-source="region_quarterly"></select></label>
       <label for="f-dev">Developer<select id="f-dev" data-source="developer_metrics developer_economics"></select></label>
       <button class="sfr-btn" id="f-reset" type="button">Reset</button>
     </div>
+    <section class="sfr-ybasis" id="yield-basis" aria-label="Yield basis">
+      <div class="sfr-ybasis-head">
+        <div class="sfr-seg" role="radiogroup" aria-label="Yield basis">
+          <button type="button" role="radio" data-basis="investor" id="yb-investor">Investor yield</button>
+          <button type="button" role="radio" data-basis="market" id="yb-market">Market yield</button>
+        </div>
+        <p class="sfr-note" id="yb-formula">—</p>
+      </div>
+      <div class="sfr-ybasis-fields" id="yb-fields">
+        <label for="yb-uplift">New-let rent uplift<span class="sfr-in"><input id="yb-uplift" type="number" min="-20" max="40" step="0.5" inputmode="decimal"><i>%</i></span></label>
+        <label for="yb-discount">Bulk purchase discount<span class="sfr-in"><input id="yb-discount" type="number" min="0" max="40" step="0.5" inputmode="decimal"><i>%</i></span></label>
+        <label for="yb-opex">Operating costs<span class="sfr-in"><input id="yb-opex" type="number" min="0" max="60" step="0.5" inputmode="decimal"><i>% of rent</i></span></label>
+        <label for="yb-opexl">London operating costs<span class="sfr-in"><input id="yb-opexl" type="number" min="0" max="60" step="0.5" inputmode="decimal"><i>% of rent</i></span></label>
+        <label for="yb-pc">Purchaser's costs<span class="sfr-in"><input id="yb-pc" type="number" min="0" max="15" step="0.1" inputmode="decimal"><i>%</i></span></label>
+        <label for="yb-mix">Property mix<select id="yb-mix">
+          <option value="ts">Terraced + semi (50/50)</option><option value="semi">Semi-detached</option><option value="terraced">Terraced</option>
+          <option value="houses">All houses (equal thirds)</option><option value="detached">Detached</option>
+        </select></label>
+        <button class="sfr-btn" id="yb-reset" type="button">Default assumptions</button>
+      </div>
+    </section>
   </header>
 
   <section class="sfr-kpis" id="kpis" aria-label="Headline figures">
-    <div class="sfr-kpi" id="kpi-ny"><span class="lbl">Net yield · semi-detached house</span><b class="val dash-skeleton" data-source="kpi" data-field="net_yield" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="net_yield_change" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
+    <div class="sfr-kpi" id="kpi-ny"><span class="lbl"><span class="t-yname">Net initial yield</span> · <span class="t-ymix">terraced + semi</span></span><b class="val dash-skeleton" data-y="now">—</b><span class="sub"><span class="dash-skeleton" data-y="chg">—</span> on a year ago</span></div>
     <div class="sfr-kpi" id="kpi-rent"><span class="lbl">Average rent · semi-detached</span><b class="val dash-skeleton" data-source="kpi" data-field="rent_pcm" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="rent_12m" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
     <div class="sfr-kpi" id="kpi-price"><span class="lbl">Average price · semi-detached</span><b class="val dash-skeleton" data-source="kpi" data-field="price" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="price_12m" data-k="kpi" data-dir="1">—</span> on a year ago</span></div>
     <div class="sfr-kpi" id="kpi-units"><span class="lbl">Houses in SFR bulk deals · 4 quarters</span><b class="val dash-skeleton" data-source="kpi" data-field="bulk_houses" data-k="kpi">—</b><span class="sub"><span class="dash-skeleton" data-source="kpi" data-field="bulk_houses_change" data-k="kpi" data-dir="1">—</span> vs prior 4 quarters</span></div>
@@ -137,7 +172,7 @@
           <div><h2>Where SFR bulk deals happen</h2><p class="sfr-note">Regions shaded by the chosen metric, latest quarter. Dots are bulk purchases of 5+ new-build houses on one street, sized by houses (Land Registry, 2019 onwards). Click a region to filter.</p></div>
           <div class="sfr-filters">
             <label for="map-metric">Shade by<select id="map-metric" class="sfr-metric">
-              <option value="net_yield">Net yield</option><option value="median_price">Semi-detached price</option>
+              <option value="net_yield">Yield (your basis)</option><option value="median_price">Semi-detached price</option>
               <option value="rent_pcm">Semi-detached rent (pcm)</option><option value="rent_12m">Rent growth, 12 months</option>
             </select></label>
             <label for="map-deals">Deals<select id="map-deals" class="sfr-metric">
@@ -149,7 +184,7 @@
         <div class="sfr-legend" id="map-legend"></div>
       </div>
       <div class="sfr-card" id="card-region-bars">
-        <div><h2>Net yield by region</h2><p class="sfr-note">Semi-detached house rent less 25% operating costs (30% in London), over the average semi-detached price, latest quarter.</p></div>
+        <div><h2><span class="t-yname">Net initial yield</span> by region</h2><p class="sfr-note">Latest quarter, <span class="t-ymix">terraced + semi</span> houses, on the yield basis set at the top of the page.</p></div>
         <div class="sfr-chart" id="region-bars" data-source="region_quarterly"></div>
         <div><h2>Rent vs price growth</h2><p class="sfr-note">Semi-detached houses, change over the last 12 months. Where rents outrun prices, yields are widening.</p></div>
         <div class="sfr-chart" id="growth-bars" data-source="region_growth"></div>
@@ -211,7 +246,7 @@
         <div><h2 id="dd-sizes-title">By house size</h2><p class="sfr-note">Latest quarter for rents and prices. New-build figures cover standard (non-bulk) sales of new houses in the four fully registered quarters to <span id="dd-nb-q">—</span>. ONS and Land Registry don't publish prices by bedroom count, so price and yield are shown by property type only.</p></div>
         <div class="sfr-tablewrap"><table id="dd-size-table"><thead><tr>
           <th>Size</th><th class="num">Rent pcm</th><th class="num">Rent 12m</th><th class="num hide-sm">Rent 3y</th>
-          <th class="num">Avg price</th><th class="num">Price 12m</th><th class="num">Gross yield</th><th class="num hide-sm">Net yield</th>
+          <th class="num">Avg price</th><th class="num">Price 12m</th><th class="num">Gross yield</th><th class="num hide-sm t-yshort">Net yield</th>
           <th class="num hide-sm">New-build median</th><th class="num hide-sm">New-build sales</th>
         </tr></thead><tbody></tbody></table></div>
       </div>
@@ -236,7 +271,7 @@
           <th class="num hide-sm" data-col="rent_3y"><button type="button" data-sort="rent_3y">Rent 3y</button></th>
           <th class="num" data-col="price_now"><button type="button" data-sort="price_now">Avg price</button></th>
           <th class="num hide-sm" data-col="price_12m"><button type="button" data-sort="price_12m">Price 12m</button></th>
-          <th class="num" data-col="gross_yield"><button type="button" data-sort="gross_yield">Gross yield</button></th>
+          <th class="num" data-col="gross_yield"><button type="button" data-sort="gross_yield"><span class="t-yshort">Net yield</span></button></th>
           <th class="num hide-sm" data-col="nb_median"><button type="button" data-sort="nb_median">New-build median</button></th>
           <th class="num hide-sm" data-col="nb_sales"><button type="button" data-sort="nb_sales">New-build sales</button></th>
           <th class="num" data-field="sfr_bulk_houses_total"><button type="button" data-sort="sfr_bulk_houses_total">SFR deals</button></th>
@@ -252,7 +287,7 @@
         <div class="sfr-chart" id="rent-lines" data-source="region_quarterly"></div>
       </div>
       <div class="sfr-card wide" id="card-yield">
-        <div><h2>Net yield over time</h2><p class="sfr-note">Semi-detached rent less operating costs, over the average semi-detached price. The forecast combines the rent assumption with the blended price forecast.</p></div>
+        <div><h2><span class="t-yname">Net initial yield</span> over time</h2><p class="sfr-note"><span class="t-ymix">Terraced + semi</span> houses on the yield basis set at the top of the page. The forecast applies the rent assumption and the blended Knight Frank / Savills price forecast to the same mix; the band is shown for the selected region.</p></div>
         <div class="sfr-chart" id="yield-lines" data-source="region_quarterly"></div>
       </div>
       <div class="sfr-card wide" id="card-outlook">
@@ -263,8 +298,8 @@
             <th class="num" data-field="rent_now">Rent now</th>
             <th class="num" data-field="rent_fc">Rent 2028</th>
             <th class="num hide-sm" data-field="rent_fc_growth">Rent growth</th>
-            <th class="num" data-field="net_yield_now">Net yield now</th>
-            <th class="num" data-field="net_yield_fc">Net yield 2028</th>
+            <th class="num" data-field="net_yield_now"><span class="t-yshort">Net yield</span> now</th>
+            <th class="num" data-field="net_yield_fc"><span class="t-yshort">Net yield</span> 2028</th>
             <th class="num hide-sm" data-field="price_fc_growth">Price growth</th>
           </tr></thead><tbody></tbody></table></div>
       </div>
@@ -374,7 +409,8 @@
     <dl class="sfr-defs">
       <div><dt>Bulk deal</dt><dd>Five or more new-build houses on one street, registered on the same day to a non-private buyer (Land Registry category B). Likely SFR/PRS when the median price is at least 80% of local open-market new-build prices.</dd></div>
       <div><dt>Discount to open market</dt><dd>One minus the deal's median price over the median standard new-build house price in the same council and year, weighted by houses.</dd></div>
-      <div><dt>Net yield</dt><dd>Annual semi-detached rent (ONS) less operating costs of 25% (30% in London), divided by the average semi-detached price (UK HPI). ONS rents cover all tenancies, so they trail new-let rents on new SFR stock.</dd></div>
+      <div><dt>Market yield</dt><dd>ONS rent × 12, less operating costs, divided by the Land Registry average price for the chosen house types. ONS rents cover all tenancies, so they trail new-let rents.</dd></div>
+      <div><dt>Investor yield (net initial yield)</dt><dd>ONS rent raised by the new-let uplift, × 12, less operating costs, divided by the average price less the bulk discount and grossed up for purchaser's costs. All assumptions are set in the Yield basis panel and saved in your browser.</dd></div>
       <div><dt>Yield on cost</dt><dd>Net rent divided by total development cost (land, build, fees and finance). The return if you fund the scheme at cost.</dd></div>
       <div><dt>Profit on cost</dt><dd>Developer's margin on the bulk sale: exit price less total development cost, over total development cost.</dd></div>
       <div><dt>Sales rate</dt><dd>Open-market reservations per sales outlet per week. Housebuilders report it as their main velocity measure.</dd></div>
@@ -655,6 +691,74 @@
       .on('pointerleave', () => { rule.style('opacity', 0); dots.selectAll('circle').remove(); tt.hide(); });
   }
 
+  // ---------- yield basis (viewer's own assumptions; drives every market yield on the page) ----------
+  const YS_DEFAULT = { basis: 'investor', uplift: 8, discount: 10, opex: 25, opexLondon: 30, pc: 6.8, mix: 'ts' };
+  let YS = { ...YS_DEFAULT };
+  try { const saved = JSON.parse(localStorage.getItem('sfr-yield-basis') || 'null'); if (saved) YS = { ...YS_DEFAULT, ...saved }; } catch (e) { /* storage unavailable */ }
+  const MIX = { ts: [['terraced', 0.5], ['semi', 0.5]], semi: [['semi', 1]], terraced: [['terraced', 1]], houses: [['detached', 1 / 3], ['semi', 1 / 3], ['terraced', 1 / 3]], detached: [['detached', 1]] };
+  const MIX_LABEL = { ts: 'terraced + semi', semi: 'semi-detached', terraced: 'terraced', houses: 'all houses', detached: 'detached' };
+  const investor = () => YS.basis === 'investor';
+  // Headline yield: market = net yield on open-market price; investor = net initial yield on discounted price plus purchaser's costs.
+  function yieldOf(rentPcm, price, region) {
+    if (!rentPcm || !price) return null;
+    const inv = investor();
+    const rent = rentPcm * 12 * (inv ? 1 + YS.uplift / 100 : 1);
+    const paid = price * (inv ? 1 - YS.discount / 100 : 1);
+    const opex = (region === 'London' ? YS.opexLondon : YS.opex) / 100;
+    const gross = rent / paid, net = gross * (1 - opex);
+    const head = inv ? net / (1 + YS.pc / 100) : net;
+    return { gross, net, head };
+  }
+  const yName = () => investor() ? (YS.pc > 0 ? 'Net initial yield' : 'Net yield (investor)') : 'Net yield (market)';
+  const yShort = () => investor() ? (YS.pc > 0 ? 'NIY' : 'Net yield') : 'Net yield';
+  function mixRP(row, mix = YS.mix) {
+    let r = 0, p = 0, w = 0;
+    for (const [t, wt] of MIX[mix]) { if (row['rent_' + t] == null || row['price_' + t] == null) continue; r += wt * row['rent_' + t]; p += wt * row['price_' + t]; w += wt; }
+    return w ? { rent: r / w, price: p / w } : null;
+  }
+  const rowYield = (row, mix) => { const m = mixRP(row, mix); return m ? yieldOf(m.rent, m.price, row.region) : null; };
+  // Quarterly series per region: actuals from region_types_quarterly; forecast scales the mix by the semi forecast's rent and price paths.
+  function regionYieldSeries(region) {
+    const rt = dash.data('region_types_quarterly').data.filter((r) => r.region === region).sort((a, b) => a.period < b.period ? -1 : 1);
+    const fc = dash.data('region_quarterly').data.filter((r) => r.region === region).sort((a, b) => a.period < b.period ? -1 : 1);
+    const out = rt.map((r) => { const y = rowYield(r); return y && { period: r.period, quarter: r.quarter, fc: false, y: y.head, gross: y.gross }; }).filter(Boolean);
+    const last = rt[rt.length - 1], base = fc.filter((r) => r.basis === 'Actual').pop(), m = last && mixRP(last);
+    if (m && base) for (const f of fc.filter((r) => r.basis === 'Forecast')) {
+      const rr = f.rent_pcm / base.rent_pcm, pr = f.median_price / base.median_price;
+      const y = yieldOf(m.rent * rr, m.price * pr, region);
+      const lo = yieldOf(m.rent * (f.rent_lo / base.rent_pcm), m.price * (f.price_hi / base.median_price), region);
+      const hi = yieldOf(m.rent * (f.rent_hi / base.rent_pcm), m.price * (f.price_lo / base.median_price), region);
+      out.push({ period: f.period, quarter: f.quarter, fc: true, y: y.head, gross: y.gross, lo: lo.head, hi: hi.head });
+    }
+    return out;
+  }
+  const yReady = () => ['region_types_quarterly', 'region_quarterly'].every((id) => dash.data(id).status === 'ok');
+
+  function drawYieldPanel() {
+    const inv = investor();
+    $('#yb-investor').setAttribute('aria-checked', String(inv)); $('#yb-market').setAttribute('aria-checked', String(!inv));
+    const set = (id, v) => { const el = $(id); if (el !== document.activeElement) el.value = v; };
+    set('#yb-uplift', YS.uplift); set('#yb-discount', YS.discount); set('#yb-opex', YS.opex); set('#yb-opexl', YS.opexLondon); set('#yb-pc', YS.pc); set('#yb-mix', YS.mix);
+    document.querySelectorAll('#yb-fields input').forEach((i) => { i.disabled = !inv && !/opex/.test(i.id); });
+    $('#yb-mix').disabled = false;
+    $('#yb-formula').textContent = inv
+      ? `${yName()} = rent × ${(1 + YS.uplift / 100).toFixed(3).replace(/0+$/, '').replace(/\.$/, '')} × 12 × (1 − ${YS.opex}% costs, ${YS.opexLondon}% London) ÷ [price × ${(1 - YS.discount / 100).toFixed(3).replace(/0+$/, '').replace(/\.$/, '')}${YS.pc > 0 ? ' × ' + (1 + YS.pc / 100).toFixed(3).replace(/0+$/, '') : ''}], ${MIX_LABEL[YS.mix]} houses.`
+      : `Net yield (market) = ONS rent × 12 × (1 − ${YS.opex}% costs, ${YS.opexLondon}% London) ÷ average price, ${MIX_LABEL[YS.mix]} houses. No uplift, discount or purchaser's costs.`;
+    document.querySelectorAll('.t-yname').forEach((el) => { el.textContent = yName(); });
+    document.querySelectorAll('.t-yname-lc').forEach((el) => { el.textContent = yName().replace(/^N/, 'n'); });
+    document.querySelectorAll('.t-ymix').forEach((el) => { el.textContent = MIX_LABEL[YS.mix]; });
+    document.querySelectorAll('.t-yshort').forEach((el) => { el.textContent = yShort(); });
+  }
+  const saveYS = () => { try { localStorage.setItem('sfr-yield-basis', JSON.stringify(YS)); } catch (e) { /* storage unavailable */ } draw(); };
+  document.querySelectorAll('#yield-basis [data-basis]').forEach((b) => b.addEventListener('click', () => { YS.basis = b.dataset.basis; saveYS(); }));
+  [['#yb-uplift', 'uplift'], ['#yb-discount', 'discount'], ['#yb-opex', 'opex'], ['#yb-opexl', 'opexLondon'], ['#yb-pc', 'pc']].forEach(([id, k]) => {
+    const el = $(id);
+    el.addEventListener('input', () => { const v = parseFloat(el.value); if (Number.isFinite(v) && el.validity.valid) { YS[k] = v; saveYS(); } });
+    el.addEventListener('blur', () => { el.value = YS[k]; });
+  });
+  $('#yb-mix').addEventListener('change', (e) => { YS.mix = e.target.value; saveYS(); });
+  $('#yb-reset').addEventListener('click', () => { YS = { ...YS_DEFAULT }; saveYS(); });
+
   // ---------- page state ----------
   const P = () => ({ region: dash.params().region || 'All', developer: dash.params().developer || 'All' });
   const inScope = (r, p = P()) => (p.region === 'All' || r.region === p.region) && (p.developer === 'All' || r.developer === p.developer);
@@ -700,6 +804,15 @@
       el.textContent = v == null ? '—' : f2(v);
       if (el.dataset.dir && v != null) el.classList.add(v >= 0 ? 'sfr-up' : 'sfr-down');
     });
+    const regs = p.region === 'All' ? REGION_ORDER : [p.region];
+    const ser = yReady() ? regs.map((r) => regionYieldSeries(r).filter((x) => !x.fc)).filter((x) => x.length > 4) : [];
+    const now = ser.length ? d3.mean(ser, (x) => x[x.length - 1].y) : null, ago = ser.length ? d3.mean(ser, (x) => x[x.length - 5].y) : null;
+    document.querySelectorAll('[data-y]').forEach((el) => {
+      if (!yReady()) { el.classList.add('dash-skeleton'); return; }
+      el.classList.remove('dash-skeleton', 'sfr-up', 'sfr-down');
+      if (el.dataset.y === 'now') el.textContent = now == null ? '—' : fmt.pct2(now);
+      else { el.textContent = now == null ? '—' : pts(now - ago); if (now != null) el.classList.add(now >= ago ? 'sfr-up' : 'sfr-down'); }
+    });
     document.querySelectorAll('.t-scope').forEach((el) => { el.textContent = scopeText(p); });
     document.querySelectorAll('.t-region').forEach((el) => { el.textContent = p.region === 'All' ? 'All regions' : p.region; });
   }
@@ -715,9 +828,9 @@
     const rq = dash.data('region_quarterly').data, gr = dash.data('region_growth').data, deals = dash.data('bulk_deals').data;
     const latest = {};
     for (const r of rq) if (r.basis === 'Actual' && (!latest[r.region] || r.period > latest[r.region].period)) latest[r.region] = r;
-    const val = (region) => mapMetric === 'rent_12m' ? gr.find((g) => g.region === region)?.rent_12m : latest[region]?.[mapMetric];
+    const val = (region) => mapMetric === 'rent_12m' ? gr.find((g) => g.region === region)?.rent_12m : mapMetric === 'net_yield' ? (latest[region] && yReady() ? regionYieldSeries(region).filter((x) => !x.fc).pop()?.y : undefined) : latest[region]?.[mapMetric];
     const f = { net_yield: fmt.pct2, median_price: fmt.gbpk, rent_pcm: fmt.gbp, rent_12m: fmt.spct }[mapMetric];
-    const name = { net_yield: 'Net yield', median_price: 'Semi price', rent_pcm: 'Rent pcm', rent_12m: 'Rent growth 12m' }[mapMetric];
+    const name = { net_yield: yShort(), median_price: 'Semi price', rent_pcm: 'Rent pcm', rent_12m: 'Rent growth 12m' }[mapMetric];
     const vals = REGION_ORDER.map(val).filter((v) => v != null);
     const lo = resolve('var(--color-panel)'), hi = resolve(dash.colors[0]);
     const ramp = d3.scaleLinear(d3.extent(vals), [0.15, 1]);
@@ -793,11 +906,14 @@
 
   function drawOverviewBars() {
     const el = $('#region-bars');
-    if (ready(el, ['region_quarterly'])) {
-      const rq = dash.data('region_quarterly').data, latest = {};
-      for (const r of rq) if (r.basis === 'Actual' && (!latest[r.region] || r.period > latest[r.region].period)) latest[r.region] = r;
-      const rows = Object.values(latest).sort((a, b) => b.net_yield - a.net_yield).map((r) => ({ label: r.region, value: r.net_yield, tip: [
-        { name: 'Net yield', value: fmt.pct2(r.net_yield) }, { name: 'Gross yield', value: fmt.pct2(r.gross_yield) }, { name: 'Median price', value: fmt.gbpk(r.median_price) }, { name: 'Rent pcm', value: fmt.gbp(r.rent_pcm) }] }));
+    if (ready(el, ['region_quarterly', 'region_types_quarterly'])) {
+      const rt = dash.data('region_types_quarterly').data, latest = {};
+      for (const r of rt) if (!latest[r.region] || r.period > latest[r.region].period) latest[r.region] = r;
+      const rows = REGION_ORDER.filter((r) => latest[r]).map((reg) => {
+        const r = latest[reg], m = mixRP(r), y = rowYield(r), mk = YS.basis === 'investor' ? (() => { const b = YS.basis; YS.basis = 'market'; const v = rowYield(r); YS.basis = b; return v; })() : y;
+        return { label: reg, value: y.head, tip: [{ name: yName(), value: fmt.pct2(y.head) }, { name: 'Gross yield, this basis', value: fmt.pct2(y.gross) },
+          ...(investor() ? [{ name: 'Net yield, market basis', value: fmt.pct2(mk.net) }] : []), { name: 'Rent pcm (' + MIX_LABEL[YS.mix] + ')', value: fmt.gbp(m.rent) }, { name: 'Average price', value: fmt.gbpk(m.price) }] };
+      }).sort((a, b) => b.value - a.value);
       hbars(el, rows, { fmtv: fmt.pct2, selected: P().region });
     }
     const g = $('#growth-bars');
@@ -901,6 +1017,7 @@
     if (d.status !== 'ok') { body.replaceChildren(); return; }
     const sel = P().region;
     const rows = REGION_ORDER.map((r) => d.data.find((x) => x.region === r)).filter(Boolean);
+    if (yReady()) for (const r of rows) { const ys = regionYieldSeries(r.region); r.net_yield_now = ys.filter((x) => !x.fc).pop()?.y; r.net_yield_fc = ys[ys.length - 1]?.y; }
     body.replaceChildren(...rows.map((r) => {
       const tr = document.createElement('tr'); tr.dataset.key = r.region; if (r.region === sel) tr.className = 'sel';
       tr.append(td(r.region), td(fmt.gbp(r.rent_now), 'num'), td(fmt.gbp(r.rent_fc), 'num'), td(fmt.spct(r.rent_fc_growth), 'num hide-sm'),
@@ -935,8 +1052,15 @@
     lineChart(el, { ...regionSeries('rent_pcm', { band: ['rent_lo', 'rent_hi'] }), yFmt: fmt.gbp, height: 320 });
   }
   function drawYieldLines() {
-    const el = $('#yield-lines'); if (!ready(el, ['region_quarterly'])) return; anim(el);
-    lineChart(el, { ...regionSeries('net_yield', { band: ['net_yield_lo', 'net_yield_hi'] }), yFmt: fmt.pct2, yTick: d3.format('.1%'), height: 320 });
+    const el = $('#yield-lines'); if (!ready(el, ['region_quarterly', 'region_types_quarterly'])) return; anim(el);
+    const sel = P().region;
+    const all = Object.fromEntries(REGION_ORDER.map((r) => [r, regionYieldSeries(r)]));
+    const series = REGION_ORDER.filter((r) => all[r].length).map((r) => ({ label: r, color: regionColor(r), emph: r === sel, muted: sel !== 'All' && r !== sel,
+      points: all[r].map((x) => ({ x: new Date(x.period), y: x.y, fc: x.fc, label: x.quarter })) }));
+    let band = null;
+    if (sel !== 'All' && all[sel]) { band = all[sel].filter((x) => x.fc).map((x) => ({ x: new Date(x.period), lo: x.lo, hi: x.hi })); band.color = regionColor(sel); }
+    const f0 = all[REGION_ORDER[0]].find((x) => x.fc);
+    lineChart(el, { series, band, forecastFrom: f0 ? new Date(f0.period) : null, yFmt: fmt.pct2, yTick: d3.format('.1%'), height: 320 });
   }
 
   // ---------- developer and bulk-deal charts ----------
@@ -1438,8 +1562,8 @@
   const METRICS = {
     rent: { label: 'Rent pcm', ok: () => true, q: (r, s) => r['rent_' + s], snap: (s) => 'rent_' + s + '_now', fmt: fmt.gbp },
     price: { label: 'Average price', ok: (s) => TYPE.has(s) || s === 'all', q: (r, s) => r['price_' + s], snap: (s) => 'price_' + s + '_now', fmt: fmt.gbpk },
-    gross_yield: { label: 'Gross yield', ok: (s) => TYPE.has(s), q: (r, s) => r['rent_' + s] && r['price_' + s] ? r['rent_' + s] * 12 / r['price_' + s] : null, snap: (s) => 'gross_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
-    net_yield: { label: 'Net yield', ok: (s) => TYPE.has(s), q: (r, s) => r['rent_' + s] && r['price_' + s] ? r['rent_' + s] * 12 / r['price_' + s] * (r.region === 'London' ? 0.7 : 0.75) : null, snap: (s) => 'net_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
+    gross_yield: { label: 'Gross yield', ok: (s) => TYPE.has(s), q: (r, s) => yieldOf(r['rent_' + s], r['price_' + s], r.region)?.gross ?? null, v: (r, s) => yieldOf(r['rent_' + s + '_now'], r['price_' + s + '_now'], r.region)?.gross ?? null, snap: (s) => 'gross_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
+    net_yield: { get label() { return yName(); }, ok: (s) => TYPE.has(s), q: (r, s) => yieldOf(r['rent_' + s], r['price_' + s], r.region)?.head ?? null, v: (r, s) => yieldOf(r['rent_' + s + '_now'], r['price_' + s + '_now'], r.region)?.head ?? null, snap: (s) => 'net_yield_' + s, fmt: fmt.pct2, tick: d3.format('.1%') },
     rent_12m: { label: 'Rent growth, 12 months', ok: () => true, q: null, snap: (s) => 'rent_' + s + '_12m', fmt: fmt.spct, tick: d3.format('.0%') },
     nb_median: { label: 'New-build house median price', ok: (s) => HOUSE.has(s), q: (r, s) => r.sales_complete ? r['nb_median_' + s] : null, snap: (s) => 'nb_median_' + s + '_4q', fmt: fmt.gbpk },
     nb_sales: { label: 'New-build house sales', ok: (s) => HOUSE.has(s), q: (r, s) => r.sales_complete ? r['nb_sales_' + s] : null, snap: (s) => 'nb_sales_' + s + '_4q', fmt: fmt.int },
@@ -1505,7 +1629,7 @@
       const h = HOUSE.has(s);
       tr.append(td(l), cell('rent_' + s + '_now', fmt.gbp), cell('rent_' + s + '_12m', fmt.spct), cell('rent_' + s + '_3y', fmt.spct, 'hide-sm'),
         cell(TYPE.has(s) || s === 'all' ? 'price_' + s + '_now' : null, fmt.gbpk), cell(TYPE.has(s) || s === 'all' ? 'price_' + s + '_12m' : null, fmt.spct),
-        cell(TYPE.has(s) ? 'gross_yield_' + s : null, fmt.pct2), cell(TYPE.has(s) ? 'net_yield_' + s : null, fmt.pct2, 'hide-sm'),
+        ...(() => { const y = TYPE.has(s) ? yieldOf(a['rent_' + s + '_now'], a['price_' + s + '_now'], a.region) : null; return [td(y ? fmt.pct2(y.gross) : '—', 'num'), td(y ? fmt.pct2(y.head) : '—', 'num hide-sm')]; })(),
         cell(h ? 'nb_median_' + s + '_4q' : null, fmt.gbpk, 'hide-sm'), cell(h ? 'nb_sales_' + s + '_4q' : null, fmt.int, 'hide-sm'));
       return tr;
     }));
@@ -1535,7 +1659,7 @@
     return {
       rent_now: 'rent_' + s + '_now', rent_12m: 'rent_' + s + '_12m', rent_3y: 'rent_' + s + '_3y',
       price_now: TYPE.has(s) || s === 'all' ? 'price_' + s + '_now' : null, price_12m: TYPE.has(s) || s === 'all' ? 'price_' + s + '_12m' : null,
-      gross_yield: TYPE.has(s) ? 'gross_yield_' + s : null, nb_median: HOUSE.has(s) ? 'nb_median_' + s + '_4q' : null, nb_sales: HOUSE.has(s) ? 'nb_sales_' + s + '_4q' : null,
+      gross_yield: TYPE.has(s) ? '_y' : null, nb_median: HOUSE.has(s) ? 'nb_median_' + s + '_4q' : null, nb_sales: HOUSE.has(s) ? 'nb_sales_' + s + '_4q' : null,
       sfr_bulk_houses_total: 'sfr_bulk_houses_total', area_name: 'area_name',
     }[col];
   }
@@ -1550,8 +1674,8 @@
       el.replaceChildren(); el.style.minHeight = '';
       const d = document.createElement('div'); d.className = 'sfr-failed'; d.textContent = m.label + ' is not published for ' + sizeLabel(s).toLowerCase() + ' homes'; el.appendChild(d); return;
     }
-    const f = m.snap(s);
-    let rows = ctx.children.filter((r) => r[f] != null).map((r) => ({ label: r.area_name, value: r[f], code: r.area_code })).sort((a, b) => b.value - a.value);
+    const f = m.snap(s), mv = (r) => m.v ? m.v(r, s) : r[f];
+    let rows = ctx.children.filter((r) => mv(r) != null).map((r) => ({ label: r.area_name, value: mv(r), code: r.area_code })).sort((a, b) => b.value - a.value);
     const n = rows.length; const top = rows.slice(0, 20);
     if (ddArea && !top.some((r) => r.code === ddArea)) { const sel = rows.find((r) => r.code === ddArea); if (sel) top.push(sel); }
     $('#dd-rank-note').textContent = (n > 20 ? 'Top 20 of ' + n + '. ' : '') + 'Click a bar to open that area.';
@@ -1572,6 +1696,7 @@
     $('#dd-table-title').textContent = (ctx.region === 'All' ? 'Regions' : 'Councils in ' + ctx.region) + ' · ' + sizeLabel(s);
     t.querySelectorAll('th[data-col]').forEach((th) => { const f = ddField(th.dataset.col, s); if (f) th.setAttribute('data-field', f); else th.removeAttribute('data-field'); });
     const q = $('#dd-search').value.trim().toLowerCase();
+    for (const r of ctx.children) r._y = TYPE.has(s) ? yieldOf(r['rent_' + s + '_now'], r['price_' + s + '_now'], r.region)?.head ?? null : null;
     const sortField = ddField(ddSorts.key, s) || 'area_name';
     const rows = sortRows(ctx.children.filter((r) => !q || r.area_name.toLowerCase().includes(q)), { key: sortField, dir: ddSorts.dir });
     const cols = [['rent_now', fmt.gbp], ['rent_12m', fmt.spct], ['rent_3y', fmt.spct, 'hide-sm'], ['price_now', fmt.gbpk], ['price_12m', fmt.spct, 'hide-sm'], ['gross_yield', fmt.pct2], ['nb_median', fmt.gbpk, 'hide-sm'], ['nb_sales', fmt.int, 'hide-sm'], ['sfr_bulk_houses_total', fmt.int]];
@@ -1607,7 +1732,7 @@
   wireSort('dev-table'); wireSort('deal-table');
 
   function draw() {
-    drawFilters(); drawKpis();
+    drawFilters(); drawYieldPanel(); drawKpis();
     for (const f of pages[page]) f();
   }
   dash.onData(draw);

@@ -10,6 +10,7 @@ Static site served by GitHub Pages from `main` at the repo root (https://radhxy.
 
 ## Data
 - `region_quarterly.json`, `area_quarterly.json`: ONS Price Index of Private Rents, HM Land Registry UK HPI and Price Paid, MHCLG Live Table 217.
+- `region_types_quarterly.json`: region rows from `area_quarterly.json` (rent and price by property type), so the main tabs don't load the 5 MB council file. Every market yield is computed in the page by `yieldOf()` from rent and price on the viewer's Yield basis (market, or investor: new-let uplift, bulk discount, operating costs, purchaser's costs, property mix); don't store yields in the data files.
 - `bulk_deals.json`: Price Paid category B, 5+ new-build houses on one street on one day; deals at 80%+ of the local open-market new-build median are "Likely SFR/PRS".
 - `developer_metrics.json`: housebuilder results, one row per metric with `source_url` and `source_type`.
 - `developer_economics.json`: one row per housebuilder from its latest results (margins, ASPs, land cost share, land bank, build cost inflation, bulk/partner volumes), with `source_url`. `land_cost_derived` marks shares calculated from reported land values rather than stated. Scheme-level charts on that tab only show a visitor's own uploaded spreadsheet.
